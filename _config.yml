@@ -1,0 +1,13 @@
+# GitHub Pages Configuration
+title: Si Pena Ajaib
+description: Aplikasi interaktif untuk belajar menulis huruf, kata, dan cerita
+theme: null
+highlighter: none
+markdown: kramdown
+
+# Build settings
+exclude: ['node_modules']
+
+# URL settings
+baseurl: "/si-pena-ajaib"
+url: "https://fadilyusuf725-commits.github.io"
