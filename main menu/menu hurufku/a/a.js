@@ -1,4 +1,4 @@
-/* huruf-script.js — FINAL for letter A
+﻿/* huruf-script.js â€” FINAL for letter A
    - masks generated from glyph outlines (templateCanvas)
    - coverage computed only on pixels inside glyph masks
    - petunjuk arrows drawn inside glyph outlines
@@ -67,11 +67,11 @@ const BIG_FONT = 350;   // glyph font size (big)
 const SMALL_FONT = 350; // using same to keep proportions for Nunito
 
 /* sampling & percent thresholds */
-const SAMPLE_STEP = 4;               // pixel sampling step
-const COVERAGE_THRESHOLD_PCT = 50;   // percent required per glyph
-// Outside-ink detection: if a significant portion of strokes lie outside glyph masks
-const OUTSIDE_THRESHOLD_PCT = 30;    // percent of ink outside masks to trigger 'salah'
-const MIN_INK_SAMPLES = 30;         // minimum ink samples before outside check applies
+const SAMPLE_STEP = 3;               // pixel sampling step (smaller -> finer sampling)
+const COVERAGE_THRESHOLD_PCT = 40;   // percent required per glyph (easier for kids)
+// Outside-ink detection: be forgiving for kids â€” allow more outside ink
+const OUTSIDE_THRESHOLD_PCT = 50;    // percent of ink outside masks to trigger 'salah'
+const MIN_INK_SAMPLES = 20;         // minimum ink samples before outside check applies
 
 /* ---------- Helpers ---------- */
 function drawArrowHead(ctx, x1, y1, x2, y2, size = 14) {
@@ -172,6 +172,30 @@ function renderGlyphMasks() {
       }
     }
   }
+
+  // Dilate masks slightly so near-miss strokes count as inside (forgive small offsets)
+  function dilateMask(mask, w, h, radius=2) {
+    const out = new Uint8Array(w*h);
+    const r = Math.max(1, radius);
+    for (let y=0;y<h;y++){
+      for (let x=0;x<w;x++){
+        const flat = y*w + x;
+        if (mask[flat]) {
+          for (let yy = Math.max(0,y-r); yy <= Math.min(h-1,y+r); yy++){
+            for (let xx = Math.max(0,x-r); xx <= Math.min(w-1,x+r); xx++){
+              out[yy*w + xx] = 1;
+            }
+          }
+        }
+      }
+    }
+    return out;
+  }
+
+  try {
+    leftMaskPixels = dilateMask(leftMaskPixels, CANVAS_W, CANVAS_H, 3);
+    rightMaskPixels = dilateMask(rightMaskPixels, CANVAS_W, CANVAS_H, 3);
+  } catch(e) { /* ignore if any issue */ }
 }
 
 /* draw dashed glyph outlines + optional arrows/numbers (over template) */
@@ -216,13 +240,13 @@ function renderGuideTemplate(withArrows = false) {
       const barY = Cy + 15;
 
       // Number 1 on left slant
-      tctx.fillText('①', Lx - 60, topY + 40);
+      tctx.fillText('â‘ ', Lx - 60, topY + 40);
       
       // Number 2 on right slant
-      tctx.fillText('②', Lx + 60, topY + 40);
+      tctx.fillText('â‘¡', Lx + 60, topY + 40);
       
       // Number 3 on crossbar
-      tctx.fillText('③', Lx, barY - 50);
+      tctx.fillText('â‘¢', Lx, barY - 50);
     }
 
     // a: stroke order numbers
@@ -230,10 +254,10 @@ function renderGuideTemplate(withArrows = false) {
       const ax = Rx, ay = Cy + 8;
       
       // Number 1 on entrance curve
-      tctx.fillText('①', ax + 20, ay - 80);
+      tctx.fillText('â‘ ', ax + 20, ay - 80);
       
       // Number 2 on body circle
-      tctx.fillText('②', ax - 40, ay + 20);
+      tctx.fillText('â‘¡', ax - 40, ay + 20);
     }
 
     tctx.restore();
@@ -241,7 +265,7 @@ function renderGuideTemplate(withArrows = false) {
 }
 
 /* Draw guide on drawCanvas background if no template present.
-   We will not overwrite user strokes—this function is used when clearing to re-draw background. */
+   We will not overwrite user strokesâ€”this function is used when clearing to re-draw background. */
 function drawGuideBackgroundOnDrawCanvas() {
   // draw white bg under user strokes
   ctx.save();
@@ -311,7 +335,7 @@ function evaluateCoverage() {
 
   // jika user sebelumnya membuat terlalu banyak coretan di luar area, minta hapus dulu
   if (tooMessy) {
-    if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf — tekan "Hapus Coretan" dan coba lagi.';
+    if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf â€” tekan "Hapus Coretan" dan coba lagi.';
     return;
   }
 
@@ -393,7 +417,7 @@ function evaluateCoverage() {
     localStorage.setItem('progressLetters', JSON.stringify(progressLetters));
 
     if (traceFeedback)
-      traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa 🎉';
+      traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa ðŸŽ‰';
   }
 
   updateGridDoneMark();
@@ -466,8 +490,8 @@ if (pronounceBtn) {
 /* music toggle */
 if (musicBtn) {
   musicBtn.addEventListener('click', () => {
-    if (audioOn) { bgm.pause(); audioOn = false; musicBtn.textContent = '🎵'; }
-    else { bgm.play().catch(()=>{}); audioOn = true; musicBtn.textContent = '🔊'; }
+    if (audioOn) { bgm.pause(); audioOn = false; musicBtn.textContent = 'ðŸŽµ'; }
+    else { bgm.play().catch(()=>{}); audioOn = true; musicBtn.textContent = 'ðŸ”Š'; }
   });
 }
 
@@ -478,7 +502,7 @@ function spawnStars(n=10) {
   for (let i=0;i<n;i++){
     const el = document.createElement('div');
     el.className = 'bintang';
-    el.textContent = '⭐';
+    el.textContent = 'â­';
     el.style.left = (Math.random()*88 + 4) + 'vw';
     el.style.fontSize = (16 + Math.random()*30) + 'px';
     document.body.appendChild(el);
@@ -486,7 +510,7 @@ function spawnStars(n=10) {
   }
 }
 
-/* update grid done marks — kept safe (grid may not exist) */
+/* update grid done marks â€” kept safe (grid may not exist) */
 function updateGridDoneMark(){
   const gridEl = document.getElementById('grid'); // local query
   if (!gridEl) return;
@@ -509,5 +533,6 @@ window._huruf_helpers = {
   rightMaskCount,
   COVERAGE_THRESHOLD_PCT
 };
+
 
 

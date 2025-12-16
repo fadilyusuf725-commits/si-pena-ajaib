@@ -62,11 +62,11 @@ const BIG_FONT = 350;
 const SMALL_FONT = 350;
 
 /* sampling & percent thresholds */
-const SAMPLE_STEP = 4;
+const SAMPLE_STEP = 3;
 
 // Outside-ink detection
-const OUTSIDE_THRESHOLD_PCT = 30;
-const MIN_INK_SAMPLES = 30;
+const OUTSIDE_THRESHOLD_PCT = 50;
+const MIN_INK_SAMPLES = 20;
 
 
 /* ---------- Helpers ---------- */
@@ -450,6 +450,7 @@ window._huruf_helpers = {
   rightMaskCount,
   COVERAGE_THRESHOLD_PCT
 };
+
 
 
 
