@@ -306,7 +306,7 @@ function evaluateCoverage() {
       const idx = flat * 4;
 
       const r = drawImg[idx], g = drawImg[idx+1], b = drawImg[idx+2], a = drawImg[idx+3];
-      const isInk = (a > 20 && r < 110 && g < 150 && b > 100);
+      const isInk = (a > 20 && (r + g + b) < 700);
       if (!isInk) continue;
 
       totalInkSamples++;
@@ -315,8 +315,16 @@ function evaluateCoverage() {
     }
   }
 
-  const leftPct = leftMaskCount ? Math.round((leftHit / Math.ceil(leftMaskCount / (SAMPLE_STEP*SAMPLE_STEP))) * 100) : 0;
-  const rightPct = rightMaskCount ? Math.round((rightHit / Math.ceil(rightMaskCount / (SAMPLE_STEP*SAMPLE_STEP))) * 100) : 0;
+  let sampledLeftMask = 0, sampledRightMask = 0;
+  for (let y = 0; y < CANVAS_H; y += SAMPLE_STEP) {
+    for (let x = 0; x < CANVAS_W; x += SAMPLE_STEP) {
+      const flat = y * CANVAS_W + x;
+      if (leftMaskPixels[flat]) sampledLeftMask++;
+      if (rightMaskPixels[flat]) sampledRightMask++;
+    }
+  }
+  const leftPct = sampledLeftMask ? Math.round((leftHit / sampledLeftMask) * 100) : 0;
+  const rightPct = sampledRightMask ? Math.round((rightHit / sampledRightMask) * 100) : 0;
 
   // deteksi coretan di luar kedua mask
   const outsideHits = Math.max(0, totalInkSamples - (leftHit + rightHit));
