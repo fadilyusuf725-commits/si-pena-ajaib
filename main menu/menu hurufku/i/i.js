@@ -245,7 +245,7 @@ function getPos(e, canvas) {
 
 drawCanvas.addEventListener('pointerdown', (ev) => {
   isDrawing = true;
-  cheered = false;
+  
   const p = getPos(ev, drawCanvas);
   ctx.beginPath();
   ctx.moveTo(p.x, p.y);
@@ -365,7 +365,7 @@ clearBtn.addEventListener('click', () => {
     ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
     renderGuideTemplate(showArrows);
     cheerPlayed = false;
-    cheered = false;
+    
     tooMessy = false;
     try { drawCanvas.style.boxShadow = ''; } catch(e){};
     traceFeedback.innerHTML = 'Coretan dibersihkan.';

@@ -305,7 +305,7 @@ function getPos(e, canvas) {
 
 drawCanvas.addEventListener('pointerdown', (ev) => {
   isDrawing = true;
-  cheered = false;
+  
   const p = getPos(ev, drawCanvas);
   ctx.beginPath();
   ctx.moveTo(p.x, p.y);
@@ -435,7 +435,7 @@ clearBtn.addEventListener('click', () => {
 
     // reset status
   cheerPlayed = false;
-  cheered = false;
+  
   // reset too-messy flag and any visual error highlight
   tooMessy = false;
   try { drawCanvas.style.boxShadow = ''; } catch(e){}
