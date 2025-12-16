@@ -51,6 +51,7 @@ let isDrawing = false;
 let showArrows = false;   // arrows/numbers only when true
 let cheerPlayed = false;
 let audioOn = false;
+let tooMessy = false; // flag when user scribbles many strokes outside glyph areas
 
 /* letter / progress */
 let currentLetter = 'A'; // file is for letter A; keep dynamic if you later set body.dataset.letter
@@ -68,6 +69,9 @@ const SMALL_FONT = 350; // using same to keep proportions for Nunito
 /* sampling & percent thresholds */
 const SAMPLE_STEP = 4;               // pixel sampling step
 const COVERAGE_THRESHOLD_PCT = 50;   // percent required per glyph
+// Outside-ink detection: if a significant portion of strokes lie outside glyph masks
+const OUTSIDE_THRESHOLD_PCT = 30;    // percent of ink outside masks to trigger 'salah'
+const MIN_INK_SAMPLES = 30;         // minimum ink samples before outside check applies
 
 /* ---------- Helpers ---------- */
 function drawArrowHead(ctx, x1, y1, x2, y2, size = 14) {
@@ -305,6 +309,12 @@ function evaluateCoverage() {
     return; // blokir semua perhitungan persentase selanjutnya
   }
 
+  // jika user sebelumnya membuat terlalu banyak coretan di luar area, minta hapus dulu
+  if (tooMessy) {
+    if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf — tekan "Hapus Coretan" dan coba lagi.';
+    return;
+  }
+
   // read draw canvas pixels once
   let drawImg;
   try {
@@ -315,6 +325,7 @@ function evaluateCoverage() {
   }
 
   let leftHit = 0, rightHit = 0;
+  let totalInkSamples = 0;
 
   for (let y = 0; y < CANVAS_H; y += SAMPLE_STEP) {
     for (let x = 0; x < CANVAS_W; x += SAMPLE_STEP) {
@@ -325,6 +336,7 @@ function evaluateCoverage() {
       const isInk = (a > 20 && r < 110 && g < 150 && b > 100);
       if (!isInk) continue;
 
+      totalInkSamples++;
       if (leftMaskPixels[flat]) leftHit++;
       if (rightMaskPixels[flat]) rightHit++;
     }
@@ -332,6 +344,21 @@ function evaluateCoverage() {
 
   const leftPct = leftMaskCount ? Math.round((leftHit / Math.ceil(leftMaskCount / (SAMPLE_STEP*SAMPLE_STEP))) * 100) : 0;
   const rightPct = rightMaskCount ? Math.round((rightHit / Math.ceil(rightMaskCount / (SAMPLE_STEP*SAMPLE_STEP))) * 100) : 0;
+
+  // deteksi coretan di luar kedua mask
+  const outsideHits = Math.max(0, totalInkSamples - (leftHit + rightHit));
+  const outsidePct = totalInkSamples ? Math.round((outsideHits / totalInkSamples) * 100) : 0;
+
+  // Jika cukup banyak tinta dan persentase tinta di luar area melebihi ambang, tandai sebagai salah
+  if (totalInkSamples >= MIN_INK_SAMPLES && outsidePct >= OUTSIDE_THRESHOLD_PCT) {
+    tooMessy = true;
+    if (traceFeedback) traceFeedback.innerHTML = `Terlalu banyak coretan di luar huruf (${outsidePct}% dari coretan). Tekan "Hapus Coretan" dan coba lagi.`;
+    try {
+      drawCanvas.style.boxShadow = '0 0 0 6px rgba(255,0,0,0.45)';
+      setTimeout(() => drawCanvas.style.boxShadow = '', 1200);
+    } catch(e){}
+    return;
+  }
 
   // UPDATE FEEDBACK hanya jika belum sukses
   if (!cheerPlayed && traceFeedback) {
@@ -372,10 +399,13 @@ clearBtn.addEventListener('click', () => {
     renderGuideTemplate(showArrows);
 
     // reset status
-    cheerPlayed = false;
-    cheered = false;
+  cheerPlayed = false;
+  cheered = false;
+  // reset too-messy flag and any visual error highlight
+  tooMessy = false;
+  try { drawCanvas.style.boxShadow = ''; } catch(e){}
 
-    traceFeedback.innerHTML = 'Coretan dibersihkan.';
+  traceFeedback.innerHTML = 'Coretan dibersihkan.';
 });
 /* toggle arrows overlay (Petunjuk button) */
 if (toggleGuideBtn) {
