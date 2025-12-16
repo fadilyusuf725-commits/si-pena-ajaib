@@ -278,7 +278,7 @@ function evaluateCoverage() {
 
   // jika user sebelumnya membuat terlalu banyak coretan di luar area, minta hapus dulu
   if (tooMessy) {
-    if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf — tekan "Hapus Coretan" dan coba lagi.';
+    if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf  tekan "Hapus Coretan" dan coba lagi.';
     return;
   }
 
@@ -349,7 +349,7 @@ function evaluateCoverage() {
     localStorage.setItem('progressLetters', JSON.stringify(progressLetters));
 
     if (traceFeedback)
-      traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa 🎉';
+      traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa ';
   }
 
   updateGridDoneMark();
@@ -361,6 +361,8 @@ clearBtn.addEventListener('click', () => {
     renderGuideTemplate(showArrows);
     cheerPlayed = false;
     cheered = false;
+    tooMessy = false;
+    try { drawCanvas.style.boxShadow = ''; } catch(e){};
     traceFeedback.innerHTML = 'Coretan dibersihkan.';
 });
 
@@ -444,6 +446,7 @@ window._huruf_helpers = {
   rightMaskCount,
   COVERAGE_THRESHOLD_PCT
 };
+
 
 
 
