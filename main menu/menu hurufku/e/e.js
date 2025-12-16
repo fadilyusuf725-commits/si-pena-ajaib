@@ -277,47 +277,88 @@ drawCanvas.addEventListener('pointermove', (ev) => {
 
 /* ---------- Coverage evaluation ---------- */
 function evaluateCoverage() {
-  if (cheerPlayed) { return; }
-  if (typeof tooMessy !== 'undefined' && tooMessy) {
-    if (traceFeedback) { traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf  tekan "Hapus Coretan" dan coba lagi.'; }
+
+  /* NEW: jika sudah berhasil, langsung stop total */
+  if (cheerPlayed) {
+    return; // blokir semua perhitungan persentase selanjutnya
+  }
+
+  // jika user sebelumnya membuat terlalu banyak coretan di luar area, minta hapus dulu
+  if (tooMessy) {
+    if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf — tekan "Hapus Coretan" dan coba lagi.';
     return;
   }
+
+  // read draw canvas pixels once
   let drawImg;
-  try { drawImg = ctx.getImageData(0,0,CANVAS_W,CANVAS_H).data; } catch (err) { Write-Host 'getImageData failed' ; return; }
-  let leftHit=0, rightHit=0, totalInkSamples=0;
-  for (let y=0;y<CANVAS_H;y+=SAMPLE_STEP){
-    for (let x=0;x<CANVAS_W;x+=SAMPLE_STEP){
-      const flat = y*CANVAS_W + x;
-      const idx = flat*4;
+  try {
+    drawImg = ctx.getImageData(0,0,CANVAS_W,CANVAS_H).data;
+  } catch (err) {
+    console.warn('evaluateCoverage getImageData failed', err);
+    return;
+  }
+
+  let leftHit = 0, rightHit = 0;
+  let totalInkSamples = 0;
+
+  for (let y = 0; y < CANVAS_H; y += SAMPLE_STEP) {
+    for (let x = 0; x < CANVAS_W; x += SAMPLE_STEP) {
+      const flat = y * CANVAS_W + x;
+      const idx = flat * 4;
+
       const r = drawImg[idx], g = drawImg[idx+1], b = drawImg[idx+2], a = drawImg[idx+3];
-      const isInk = (a>20 && r<110 && g<150 && b>100);
+      const isInk = (a > 20 && r < 110 && g < 150 && b > 100);
       if (!isInk) continue;
+
       totalInkSamples++;
       if (leftMaskPixels[flat]) leftHit++;
       if (rightMaskPixels[flat]) rightHit++;
     }
   }
+
   const leftPct = leftMaskCount ? Math.round((leftHit / Math.ceil(leftMaskCount / (SAMPLE_STEP*SAMPLE_STEP))) * 100) : 0;
   const rightPct = rightMaskCount ? Math.round((rightHit / Math.ceil(rightMaskCount / (SAMPLE_STEP*SAMPLE_STEP))) * 100) : 0;
+
+  // deteksi coretan di luar kedua mask
   const outsideHits = Math.max(0, totalInkSamples - (leftHit + rightHit));
   const outsidePct = totalInkSamples ? Math.round((outsideHits / totalInkSamples) * 100) : 0;
+
+  // Jika cukup banyak tinta dan persentase tinta di luar area melebihi ambang, tandai sebagai salah
   if (totalInkSamples >= MIN_INK_SAMPLES && outsidePct >= OUTSIDE_THRESHOLD_PCT) {
     tooMessy = true;
     if (traceFeedback) traceFeedback.innerHTML = `Terlalu banyak coretan di luar huruf (${outsidePct}% dari coretan). Tekan "Hapus Coretan" dan coba lagi.`;
-    try { drawCanvas.style.boxShadow = '0 0 0 6px rgba(255,0,0,0.45)'; setTimeout(()=>drawCanvas.style.boxShadow='',1200);} catch(e){}
+    try {
+      drawCanvas.style.boxShadow = '0 0 0 6px rgba(255,0,0,0.45)';
+      setTimeout(() => drawCanvas.style.boxShadow = '', 1200);
+    } catch(e){}
     return;
   }
-  if (!cheerPlayed && traceFeedback) traceFeedback.innerHTML = `Cakupan huruf besar: ${leftPct}% | huruf kecil: ${rightPct}%`;
+
+  // UPDATE FEEDBACK hanya jika belum sukses
+  if (!cheerPlayed && traceFeedback) {
+    traceFeedback.innerHTML = `Cakupan huruf besar: ${leftPct}% | huruf kecil: ${rightPct}%`;
+  }
+
   const leftOk = leftPct >= COVERAGE_THRESHOLD_PCT;
   const rightOk = rightPct >= COVERAGE_THRESHOLD_PCT;
+
   if (leftOk && rightOk && !cheerPlayed) {
     cheerPlayed = true;
-    try { cheerAudio.currentTime = 0; cheerAudio.play().catch(()=>{}); } catch(e){}
+
+    try {
+      cheerAudio.currentTime = 0;
+      cheerAudio.play().catch(()=>{});
+    } catch(e){}
+
     spawnStars(20);
+
     progressLetters[currentLetter] = true;
     localStorage.setItem('progressLetters', JSON.stringify(progressLetters));
-    if (traceFeedback) traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa ';
+
+    if (traceFeedback)
+      traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa 🎉';
   }
+
   updateGridDoneMark();
 }
 
@@ -412,6 +453,7 @@ window._huruf_helpers = {
   rightMaskCount,
   COVERAGE_THRESHOLD_PCT
 };
+
 
 
 
