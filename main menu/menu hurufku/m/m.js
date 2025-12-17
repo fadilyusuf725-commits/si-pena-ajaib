@@ -63,6 +63,7 @@ const SMALL_FONT = 350;
 
 /* sampling & percent thresholds */
 const SAMPLE_STEP = 3;
+const COVERAGE_THRESHOLD_PCT = 40; // percent required per glyph (easier for kids)
 
 // Outside-ink detection
 const OUTSIDE_THRESHOLD_PCT = 50;

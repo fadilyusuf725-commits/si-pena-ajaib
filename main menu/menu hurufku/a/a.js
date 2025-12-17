@@ -1,4 +1,4 @@
-﻿/* huruf-script.js â€” FINAL for letter A
+﻿/* huruf-script.js — FINAL for letter A
    - masks generated from glyph outlines (templateCanvas)
    - coverage computed only on pixels inside glyph masks
    - petunjuk arrows drawn inside glyph outlines
@@ -69,7 +69,7 @@ const SMALL_FONT = 350; // using same to keep proportions for Nunito
 /* sampling & percent thresholds */
 const SAMPLE_STEP = 3;               // pixel sampling step (smaller -> finer sampling)
 const COVERAGE_THRESHOLD_PCT = 40;   // percent required per glyph (easier for kids)
-// Outside-ink detection: be forgiving for kids â€” allow more outside ink
+// Outside-ink detection: be forgiving for kids — allow more outside ink
 const OUTSIDE_THRESHOLD_PCT = 50;    // percent of ink outside masks to trigger 'salah'
 const MIN_INK_SAMPLES = 20;         // minimum ink samples before outside check applies
 
@@ -240,13 +240,13 @@ function renderGuideTemplate(withArrows = false) {
       const barY = Cy + 15;
 
       // Number 1 on left slant
-      tctx.fillText('â‘ ', Lx - 60, topY + 40);
+      tctx.fillText('①', Lx - 60, topY + 40);
       
       // Number 2 on right slant
-      tctx.fillText('â‘¡', Lx + 60, topY + 40);
+      tctx.fillText('②', Lx + 60, topY + 40);
       
       // Number 3 on crossbar
-      tctx.fillText('â‘¢', Lx, barY - 50);
+      tctx.fillText('③', Lx, barY - 50);
     }
 
     // a: stroke order numbers
@@ -254,10 +254,10 @@ function renderGuideTemplate(withArrows = false) {
       const ax = Rx, ay = Cy + 8;
       
       // Number 1 on entrance curve
-      tctx.fillText('â‘ ', ax + 20, ay - 80);
+      tctx.fillText('①', ax + 20, ay - 80);
       
       // Number 2 on body circle
-      tctx.fillText('â‘¡', ax - 40, ay + 20);
+      tctx.fillText('②', ax - 40, ay + 20);
     }
 
     tctx.restore();
@@ -265,7 +265,7 @@ function renderGuideTemplate(withArrows = false) {
 }
 
 /* Draw guide on drawCanvas background if no template present.
-   We will not overwrite user strokesâ€”this function is used when clearing to re-draw background. */
+  We will not overwrite user strokes—this function is used when clearing to re-draw background. */
 function drawGuideBackgroundOnDrawCanvas() {
   // draw white bg under user strokes
   ctx.save();
@@ -335,7 +335,7 @@ function evaluateCoverage() {
 
   // jika user sebelumnya membuat terlalu banyak coretan di luar area, minta hapus dulu
   if (tooMessy) {
-    if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf â€” tekan "Hapus Coretan" dan coba lagi.';
+    if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf — tekan "Hapus Coretan" dan coba lagi.';
     return;
   }
 
@@ -417,7 +417,7 @@ function evaluateCoverage() {
     localStorage.setItem('progressLetters', JSON.stringify(progressLetters));
 
     if (traceFeedback)
-      traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa ðŸŽ‰';
+      traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa 🎉';
   }
 
   updateGridDoneMark();
@@ -490,8 +490,8 @@ if (pronounceBtn) {
 /* music toggle */
 if (musicBtn) {
   musicBtn.addEventListener('click', () => {
-    if (audioOn) { bgm.pause(); audioOn = false; musicBtn.textContent = 'ðŸŽµ'; }
-    else { bgm.play().catch(()=>{}); audioOn = true; musicBtn.textContent = 'ðŸ”Š'; }
+    if (audioOn) { bgm.pause(); audioOn = false; musicBtn.textContent = '🎵'; }
+    else { bgm.play().catch(()=>{}); audioOn = true; musicBtn.textContent = '🔊'; }
   });
 }
 
@@ -502,7 +502,7 @@ function spawnStars(n=10) {
   for (let i=0;i<n;i++){
     const el = document.createElement('div');
     el.className = 'bintang';
-    el.textContent = 'â­';
+    el.textContent = '⭐';
     el.style.left = (Math.random()*88 + 4) + 'vw';
     el.style.fontSize = (16 + Math.random()*30) + 'px';
     document.body.appendChild(el);
@@ -510,7 +510,7 @@ function spawnStars(n=10) {
   }
 }
 
-/* update grid done marks â€” kept safe (grid may not exist) */
+/* update grid done marks — kept safe (grid may not exist) */
 function updateGridDoneMark(){
   const gridEl = document.getElementById('grid'); // local query
   if (!gridEl) return;
