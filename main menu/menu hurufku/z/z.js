@@ -347,8 +347,8 @@ function evaluateCoverage() {
     traceFeedback.innerHTML = `Cakupan huruf besar: ${leftPct}% | huruf kecil: ${rightPct}%`;
   }
 
-  const leftOk = leftPct >= COVERAGE_THRESHOLD_PCT;
-  const rightOk = rightPct >= COVERAGE_THRESHOLD_PCT;
+  const leftOk = (sampledLeftMask === 0) || leftPct >= COVERAGE_THRESHOLD_PCT;
+  const rightOk = (sampledRightMask === 0) || rightPct >= COVERAGE_THRESHOLD_PCT;
 
   if (leftOk && rightOk && !cheerPlayed) {
     cheerPlayed = true;

@@ -67,6 +67,7 @@ const SAMPLE_STEP = 3;
 // Outside-ink detection
 const OUTSIDE_THRESHOLD_PCT = 50;
 const MIN_INK_SAMPLES = 20;
+const COVERAGE_THRESHOLD_PCT = 40; // percent required per glyph (easier for kids)
 
 
 /* ---------- Helpers ---------- */
@@ -349,8 +350,8 @@ function evaluateCoverage() {
     traceFeedback.innerHTML = `Cakupan huruf besar: ${leftPct}% | huruf kecil: ${rightPct}%`;
   }
 
-  const leftOk = leftPct >= COVERAGE_THRESHOLD_PCT;
-  const rightOk = rightPct >= COVERAGE_THRESHOLD_PCT;
+  const leftOk = (sampledLeftMask === 0) || leftPct >= COVERAGE_THRESHOLD_PCT;
+  const rightOk = (sampledRightMask === 0) || rightPct >= COVERAGE_THRESHOLD_PCT;
 
   if (leftOk && rightOk && !cheerPlayed) {
     cheerPlayed = true;
