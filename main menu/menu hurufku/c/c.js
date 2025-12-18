@@ -68,6 +68,11 @@ const COVERAGE_THRESHOLD_PCT = 40; // percent required per glyph (easier for kid
 // Outside-ink detection
 const OUTSIDE_THRESHOLD_PCT = 50;
 const MIN_INK_SAMPLES = 20;
+// Scoring weights for combined metric (mask coverage + ink-inside ratio)
+const SCORE_WEIGHT_MASK = 0.6;
+const SCORE_WEIGHT_INK = 0.4;
+const SCORE_THRESHOLD = 0.6; // finalScore >= this => Selesai
+const PARTIAL_THRESHOLD = 0.3; // finalScore >= this => Sebagian
 
 
 /* ---------- Helpers ---------- */
@@ -332,11 +337,27 @@ function evaluateCoverage() {
 
   // UPDATE FEEDBACK hanya jika belum sukses
   if (!cheerPlayed && traceFeedback) {
-    traceFeedback.innerHTML = `Cakupan huruf besar: ${leftPct}% | huruf kecil: ${rightPct}%`;
+    // compute combined scores: maskCoverage and inkInsideRatio
+    const maskCoverageLeft = sampledLeftMask ? (leftHit / sampledLeftMask) : 0;
+    const maskCoverageRight = sampledRightMask ? (rightHit / sampledRightMask) : 0;
+    const inkInsideLeft = totalInkSamples ? (leftHit / totalInkSamples) : 0;
+    const inkInsideRight = totalInkSamples ? (rightHit / totalInkSamples) : 0;
+
+    const finalScoreLeft = (SCORE_WEIGHT_MASK * maskCoverageLeft) + (SCORE_WEIGHT_INK * inkInsideLeft);
+    const finalScoreRight = (SCORE_WEIGHT_MASK * maskCoverageRight) + (SCORE_WEIGHT_INK * inkInsideRight);
+
+    const labelFromScore = (score, sampled) => {
+      if (sampled === 0) return 'N/A';
+      if (score >= SCORE_THRESHOLD) return 'Selesai';
+      if (score >= PARTIAL_THRESHOLD) return 'Sebagian';
+      return 'Belum';
+    };
+
+    traceFeedback.innerHTML = `Progres menulis — Besar: ${labelFromScore(finalScoreLeft, sampledLeftMask)} | Kecil: ${labelFromScore(finalScoreRight, sampledRightMask)}`;
   }
 
-  const leftOk = (sampledLeftMask === 0) || leftPct >= COVERAGE_THRESHOLD_PCT;
-  const rightOk = (sampledRightMask === 0) || rightPct >= COVERAGE_THRESHOLD_PCT;
+  const leftOk = (sampledLeftMask === 0) || (((SCORE_WEIGHT_MASK * (sampledLeftMask ? (leftHit / sampledLeftMask) : 0)) + (SCORE_WEIGHT_INK * (totalInkSamples ? (leftHit / totalInkSamples) : 0))) >= SCORE_THRESHOLD);
+  const rightOk = (sampledRightMask === 0) || (((SCORE_WEIGHT_MASK * (sampledRightMask ? (rightHit / sampledRightMask) : 0)) + (SCORE_WEIGHT_INK * (totalInkSamples ? (rightHit / totalInkSamples) : 0))) >= SCORE_THRESHOLD);
 
   if (leftOk && rightOk && !cheerPlayed) {
     cheerPlayed = true;

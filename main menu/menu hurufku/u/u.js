@@ -344,7 +344,8 @@ function evaluateCoverage() {
 
   // UPDATE FEEDBACK hanya jika belum sukses
   if (!cheerPlayed && traceFeedback) {
-    traceFeedback.innerHTML = `Cakupan huruf besar: ${leftPct}% | huruf kecil: ${rightPct}%`;
+    const label = (pct, sampled) => sampled === 0 ? 'N/A' : (pct >= COVERAGE_THRESHOLD_PCT ? 'Selesai' : (pct >= Math.floor(COVERAGE_THRESHOLD_PCT/2) ? 'Sebagian' : 'Belum'));
+    traceFeedback.innerHTML = `Progres menulis — Besar: ${label(leftPct, sampledLeftMask)} | Kecil: ${label(rightPct, sampledRightMask)}`;
   }
 
   const leftOk = (sampledLeftMask === 0) || leftPct >= COVERAGE_THRESHOLD_PCT;
