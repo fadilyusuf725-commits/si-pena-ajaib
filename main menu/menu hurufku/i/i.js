@@ -21,14 +21,16 @@ if (templateCanvas) {
 /* draw style for user */
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
-ctx.lineWidth = 30;
+ctx.lineWidth = 25;
 ctx.strokeStyle = '#134b78';
 
 /* audio */
 const BG_MUSIC = 'https://cdn.pixabay.com/download/audio/2025/03/30/audio_3d2ec07913.mp3?filename=spring-in-my-step-copyright-free-music-for-youtube-320726.mp3';
 const CHEER = 'https://www.myinstants.com/media/sounds/kids_cheering.mp3';
-const bgm = document.getElementById('bgm') || new Audio(BG_MUSIC);
-if (!document.getElementById('bgm')) bgm.loop = true;
+window.bgm = window.bgm || document.getElementById('bgm') || new Audio(BG_MUSIC);
+const bgm = window.bgm;
+let audioOn = (function(){ try { if (typeof window !== 'undefined' && window.__bgm_playing !== undefined) return !!window.__bgm_playing; const v = localStorage && localStorage.getItem ? localStorage.getItem('bgmPlaying') : null; return v === '1'; } catch(e){ return false; } })();
+bgm.loop = true;
 const cheerAudio = new Audio(CHEER); cheerAudio.preload = 'auto'; cheerAudio.volume = 0.9;
 
 /* UI elements (expected) */
@@ -63,10 +65,10 @@ const SMALL_FONT = 350;
 
 /* sampling & percent thresholds */
 const SAMPLE_STEP = 3;
-const COVERAGE_THRESHOLD_PCT = 40; // percent required per glyph (easier for kids)
+const COVERAGE_THRESHOLD_PCT = 57; // percent required per glyph
 
 // Outside-ink detection
-const OUTSIDE_THRESHOLD_PCT = 50;
+const OUTSIDE_THRESHOLD_PCT = 60;
 const MIN_INK_SAMPLES = 20;
 
 
@@ -191,21 +193,11 @@ function renderGuideTemplate(withArrows = false) {
 
     const Lx = LEFT_CENTER_X, Rx = RIGHT_CENTER_X, Cy = GUIDE_CENTER_Y;
 
-    // I: stroke order - single vertical (1 stroke)
-    if (currentLetter.toUpperCase() === 'I') {
-      // Number 1 on vertical
-      tctx.fillText('①', Lx, Cy);
-    }
+    // Per-letter numbering handled by shared `guides.js`; avoid duplicate labels here.
 
-    // i: stroke order - dot then vertical (2 strokes)
-    if (currentLetter.toLowerCase() === 'i') {
-      // Number 1 on dot
-      tctx.fillText('①', Rx, Cy - 80);
-      
-      // Number 2 on stem
-      tctx.fillText('②', Rx, Cy + 20);
+    if (typeof drawLetterGuides === 'function') {
+      try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch(e){}
     }
-
     tctx.restore();
   }
 }
@@ -216,33 +208,20 @@ function drawGuideBackgroundOnDrawCanvas() {
   ctx.fillStyle = '#fff';
   ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
 
-  if (!tctx) {
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 5;
-    ctx.setLineDash([12,8]);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `${BIG_FONT}px Nunito, sans-serif`;
-    ctx.strokeText(currentLetter.toUpperCase(), LEFT_CENTER_X, GUIDE_CENTER_Y);
-    ctx.font = `${SMALL_FONT}px Nunito, sans-serif`;
-    ctx.strokeText(currentLetter.toLowerCase(), RIGHT_CENTER_X, GUIDE_CENTER_Y);
-    ctx.setLineDash([]);
+  if (showArrows) {
+    tctx.save();
+    if (typeof drawLetterGuides === 'function') {
+      try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch(e){}
+    }
+    tctx.restore();
   }
+
   ctx.restore();
 }
 
+// Initialize masks and initial guide render so letter shows immediately
 renderGlyphMasks();
 renderGuideTemplate(false);
-
-/* ---------- Drawing handlers ---------- */
-function getPos(e, canvas) {
-  const r = canvas.getBoundingClientRect();
-  const t = e.touches ? e.touches[0] : e;
-  return {
-    x: (t.clientX - r.left) * (canvas.width / r.width),
-    y: (t.clientY - r.top) * (canvas.height / r.height)
-  };
-}
 
 drawCanvas.addEventListener('pointerdown', (ev) => {
   isDrawing = true;

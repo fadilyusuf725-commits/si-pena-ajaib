@@ -21,14 +21,15 @@ if (templateCanvas) {
 /* draw style for user */
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
-ctx.lineWidth = 30;
+ctx.lineWidth = 25;
 ctx.strokeStyle = '#134b78';
 
 /* audio */
 const BG_MUSIC = 'https://cdn.pixabay.com/download/audio/2025/03/30/audio_3d2ec07913.mp3?filename=spring-in-my-step-copyright-free-music-for-youtube-320726.mp3';
 const CHEER = 'https://www.myinstants.com/media/sounds/kids_cheering.mp3';
-const bgm = document.getElementById('bgm') || new Audio(BG_MUSIC);
-if (!document.getElementById('bgm')) bgm.loop = true;
+window.bgm = window.bgm || document.getElementById('bgm') || new Audio(BG_MUSIC);
+const bgm = window.bgm;
+bgm.loop = true;
 const cheerAudio = new Audio(CHEER); cheerAudio.preload = 'auto'; cheerAudio.volume = 0.9;
 
 /* UI elements (expected) */
@@ -46,8 +47,9 @@ const homeFooter = document.getElementById('homeFooter');
 let isDrawing = false;
 let showArrows = false;
 let cheerPlayed = false;
-
+ 
 let tooMessy = false; // flag for outside scribbles
+let audioOn = (function(){ try { if (typeof window !== 'undefined' && window.__bgm_playing !== undefined) return !!window.__bgm_playing; const v = localStorage && localStorage.getItem ? localStorage.getItem('bgmPlaying') : null; return v === '1'; } catch(e){ return false; } })();
 /* letter / progress */
 let currentLetter = 'V';
 try { localStorage.setItem('lastVisitedFull', 'menu hurufku/v/v.html'); } catch(e){}
@@ -63,10 +65,10 @@ const SMALL_FONT = 350;
 
 /* sampling & percent thresholds */
 const SAMPLE_STEP = 3;
-const COVERAGE_THRESHOLD_PCT = 40; // percent required per glyph (easier for kids)
+const COVERAGE_THRESHOLD_PCT = 60; // percent required per glyph
 
 // Outside-ink detection
-const OUTSIDE_THRESHOLD_PCT = 50;
+const OUTSIDE_THRESHOLD_PCT = 60;
 const MIN_INK_SAMPLES = 20;
 
 
@@ -191,24 +193,11 @@ function renderGuideTemplate(withArrows = false) {
 
     const Lx = LEFT_CENTER_X, Rx = RIGHT_CENTER_X, Cy = GUIDE_CENTER_Y;
 
-    // V: stroke order - left diagonal, right diagonal (2 strokes)
-    if (currentLetter.toUpperCase() === 'V') {
-      // Number 1 on left diagonal
-      tctx.fillText('①', Lx - 60, Cy - 140);
-      
-      // Number 2 on right diagonal
-      tctx.fillText('②', Lx + 60, Cy - 140);
-    }
+    // Per-letter numbering handled by shared `guides.js`; avoid duplicate labels here.
 
-    // v: stroke order - left then right diagonal (2 strokes)
-    if (currentLetter.toLowerCase() === 'v') {
-      // Number 1 on left diagonal
-      tctx.fillText('①', Rx - 40, Cy - 60);
-      
-      // Number 2 on right diagonal
-      tctx.fillText('②', Rx + 40, Cy - 60);
+    if (typeof drawLetterGuides === 'function') {
+      try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch(e){}
     }
-
     tctx.restore();
   }
 }
@@ -230,6 +219,13 @@ function drawGuideBackgroundOnDrawCanvas() {
     ctx.font = `${SMALL_FONT}px Nunito, sans-serif`;
     ctx.strokeText(currentLetter.toLowerCase(), RIGHT_CENTER_X, GUIDE_CENTER_Y);
     ctx.setLineDash([]);
+  }
+  if (showArrows) {
+    tctx.save();
+    if (typeof drawLetterGuides === 'function') {
+      try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch(e){}
+    }
+    tctx.restore();
   }
   ctx.restore();
 }

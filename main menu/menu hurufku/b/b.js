@@ -21,14 +21,16 @@ if (templateCanvas) {
 /* draw style for user */
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
-ctx.lineWidth = 30;
+ctx.lineWidth = 25;
 ctx.strokeStyle = '#134b78';
 
 /* audio */
 const BG_MUSIC = 'https://cdn.pixabay.com/download/audio/2025/03/30/audio_3d2ec07913.mp3?filename=spring-in-my-step-copyright-free-music-for-youtube-320726.mp3';
 const CHEER = 'https://www.myinstants.com/media/sounds/kids_cheering.mp3';
-const bgm = document.getElementById('bgm') || new Audio(BG_MUSIC);
-if (!document.getElementById('bgm')) bgm.loop = true;
+window.bgm = window.bgm || document.getElementById('bgm') || new Audio(BG_MUSIC);
+const bgm = window.bgm;
+let audioOn = (function(){ try { if (typeof window !== 'undefined' && window.__bgm_playing !== undefined) return !!window.__bgm_playing; const v = localStorage && localStorage.getItem ? localStorage.getItem('bgmPlaying') : null; return v === '1'; } catch(e){ return false; } })();
+bgm.loop = true;
 const cheerAudio = new Audio(CHEER); cheerAudio.preload = 'auto'; cheerAudio.volume = 0.9;
 
 /* UI elements (expected) */
@@ -65,9 +67,9 @@ const SMALL_FONT = 350;
 const SAMPLE_STEP = 3;
 
 // Outside-ink detection
-const OUTSIDE_THRESHOLD_PCT = 50;
+const OUTSIDE_THRESHOLD_PCT = 60;
 const MIN_INK_SAMPLES = 20;
-const COVERAGE_THRESHOLD_PCT = 40; // percent required per glyph (easier for kids)
+const COVERAGE_THRESHOLD_PCT = 60; // percent required per glyph
 
 
 /* ---------- Helpers ---------- */
@@ -182,42 +184,9 @@ function renderGuideTemplate(withArrows = false) {
 
   if (withArrows) {
     tctx.save();
-    tctx.fillStyle = '#FF6B35';
-    tctx.strokeStyle = '#FF6B35';
-    tctx.lineWidth = 2;
-    tctx.font = 'bold 28px Nunito, sans-serif';
-    tctx.textAlign = 'center';
-    tctx.textBaseline = 'middle';
-
-    const Lx = LEFT_CENTER_X, Rx = RIGHT_CENTER_X, Cy = GUIDE_CENTER_Y;
-
-    // B: stroke order (3 strokes) - vertical line, upper bump, lower bump
-    if (currentLetter.toUpperCase() === 'B') {
-      const topY = Cy - 160;
-      const midY = Cy - 10;
-      const botY = Cy + 160;
-
-      // Number 1 on vertical stroke
-      tctx.fillText('①', Lx - 80, Cy);
-      
-      // Number 2 on upper bump
-      tctx.fillText('②', Lx + 70, topY + 80);
-      
-      // Number 3 on lower bump
-      tctx.fillText('③', Lx + 70, botY - 80);
+    if (typeof drawLetterGuides === 'function') {
+      try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch(e){}
     }
-
-    // b: stroke order (2 strokes) - vertical line, bump
-    if (currentLetter.toLowerCase() === 'b') {
-      const ax = Rx, ay = Cy + 8;
-      
-      // Number 1 on vertical line
-      tctx.fillText('①', ax - 80, ay);
-      
-      // Number 2 on bump
-      tctx.fillText('②', ax + 50, ay + 40);
-    }
-
     tctx.restore();
   }
 }

@@ -25,14 +25,15 @@ if (templateCanvas) {
 /* draw style for user */
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
-ctx.lineWidth = 30;
+ctx.lineWidth = 25;
 ctx.strokeStyle = '#134b78';
 
 /* audio */
 const BG_MUSIC = 'https://cdn.pixabay.com/download/audio/2025/03/30/audio_3d2ec07913.mp3?filename=spring-in-my-step-copyright-free-music-for-youtube-320726.mp3';
 const CHEER = 'https://www.myinstants.com/media/sounds/kids_cheering.mp3';
-const bgm = document.getElementById('bgm') || new Audio(BG_MUSIC);
-if (!document.getElementById('bgm')) bgm.loop = true;
+window.bgm = window.bgm || document.getElementById('bgm') || new Audio(BG_MUSIC);
+const bgm = window.bgm;
+bgm.loop = true;
 const cheerAudio = new Audio(CHEER); cheerAudio.preload = 'auto'; cheerAudio.volume = 0.9;
 
 /* UI elements (expected) */
@@ -50,7 +51,7 @@ const homeFooter = document.getElementById('homeFooter'); // footer home button 
 let isDrawing = false;
 let showArrows = false;   // arrows/numbers only when true
 let cheerPlayed = false;
-let audioOn = false;
+let audioOn = (function(){ try { if (typeof window !== 'undefined' && window.__bgm_playing !== undefined) return !!window.__bgm_playing; const v = localStorage && localStorage.getItem ? localStorage.getItem('bgmPlaying') : null; return v === '1'; } catch(e){ return false; } })();
 let tooMessy = false; // flag when user scribbles many strokes outside glyph areas
 
 /* letter / progress */
@@ -63,15 +64,16 @@ const LEFT_CENTER_X = Math.round(CANVAS_W * 0.28);
 const RIGHT_CENTER_X = Math.round(CANVAS_W * 0.72);
 const GUIDE_CENTER_Y = Math.round(CANVAS_H * 0.52);
 
-const BIG_FONT = 350;   // glyph font size (big)
-const SMALL_FONT = 350; // using same to keep proportions for Nunito
+const BIG_FONT = 350;
+const SMALL_FONT = 350;
 
 /* sampling & percent thresholds */
-const SAMPLE_STEP = 3;               // pixel sampling step (smaller -> finer sampling)
-const COVERAGE_THRESHOLD_PCT = 40;   // percent required per glyph (easier for kids)
+const SAMPLE_STEP = 3;
+const COVERAGE_THRESHOLD_PCT = 60;   // percent required per glyph
 // Outside-ink detection: be forgiving for kids — allow more outside ink
-const OUTSIDE_THRESHOLD_PCT = 50;    // percent of ink outside masks to trigger 'salah'
+const OUTSIDE_THRESHOLD_PCT = 60;    // percent of ink outside masks to trigger 'salah'
 const MIN_INK_SAMPLES = 20;         // minimum ink samples before outside check applies
+
 
 /* ---------- Helpers ---------- */
 function drawArrowHead(ctx, x1, y1, x2, y2, size = 14) {
@@ -84,9 +86,7 @@ function drawArrowHead(ctx, x1, y1, x2, y2, size = 14) {
   ctx.fill();
 }
 
-/* ---------- Render glyph outlines into templateCanvas (solid fill)
-   We'll create binary masks from these fills for left (BIG) and right (small).
-*/
+/* ---------- Render glyph outlines into templateCanvas (solid fill) */
 let leftMaskPixels = null;  // Uint8Array boolean (0/1) flatten size CANVAS_W*CANVAS_H
 let rightMaskPixels = null;
 let leftMaskCount = 0;
@@ -123,15 +123,13 @@ function renderGlyphMasks() {
   leftMaskCount = 0;
   rightMaskCount = 0;
 
-  // Determine rough bounding areas to speed up detection: left/right halves
   const midX = Math.floor(CANVAS_W/2);
 
   for (let y=0; y<CANVAS_H; y++){
     for (let x=0; x<CANVAS_W; x++){
       const idx = (y * CANVAS_W + x) * 4;
       const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
-      // if pixel is dark (black glyph), treat as glyph pixel
-      const dark = a > 10 && (r + g + b) < 200; // black-ish
+      const dark = a > 10 && (r + g + b) < 200;
       if (!dark) continue;
       const flat = y * CANVAS_W + x;
       if (x < midX) {
@@ -144,9 +142,7 @@ function renderGlyphMasks() {
     }
   }
 
-  // fallback protection: avoid zero masks
   if (leftMaskCount === 0) {
-    // fallback: approximate left box region as mask
     const boxW = Math.round(CANVAS_W * 0.28);
     const boxH = Math.round(CANVAS_H * 0.7);
     const lx = Math.round(LEFT_CENTER_X - boxW/2);
@@ -221,7 +217,7 @@ function renderGuideTemplate(withArrows = false) {
 
   tctx.setLineDash([]);
 
-  // guide numbers and visual indicators - show when withArrows is true
+  // guide arrows and numbers - show when withArrows is true
   if (withArrows) {
     tctx.save();
     tctx.fillStyle = '#FF6B35'; // orange/highlight color for visibility
@@ -233,33 +229,139 @@ function renderGuideTemplate(withArrows = false) {
 
     const Lx = LEFT_CENTER_X, Rx = RIGHT_CENTER_X, Cy = GUIDE_CENTER_Y;
 
-    // A: stroke order numbers
+    // Uppercase A: left slant, right slant, crossbar
     if (currentLetter.toUpperCase() === 'A') {
       const topY = Cy - 160;
-      const footY = Cy + 190;
-      const barY = Cy + 15;
+      const leftFootY = Cy + 75;
+      const rightFootY = Cy + 75;
 
-      // Number 1 on left slant
-      tctx.fillText('①', Lx - 60, topY + 40);
-      
-      // Number 2 on right slant
-      tctx.fillText('②', Lx + 60, topY + 40);
-      
-      // Number 3 on crossbar
-      tctx.fillText('③', Lx, barY - 50);
+      // left slant
+      tctx.beginPath(); tctx.moveTo(Lx, topY); tctx.lineTo(Lx - 100, leftFootY); tctx.stroke();
+      drawArrowHead(tctx, Lx, topY, Lx - 100, leftFootY, 12);
+      tctx.fillText('①', Lx - 85, topY + 100);
+
+      // right slant
+      tctx.beginPath(); tctx.moveTo(Lx, topY); tctx.lineTo(Lx + 100, rightFootY); tctx.stroke();
+      drawArrowHead(tctx, Lx, topY, Lx + 100, rightFootY, 12);
+      tctx.fillText('②', Lx + 85, topY + 100);
+
+      // crossbar (left to right)
+      const barY = Cy + 10;
+      tctx.beginPath(); tctx.moveTo(Lx - 40, barY); tctx.lineTo(Lx + 40, barY); tctx.stroke();
+      drawArrowHead(tctx, Lx - 40, barY, Lx + 40, barY, 10);
+      tctx.fillText('③', Lx, barY - 30);
     }
 
-    // a: stroke order numbers
+    // Lowercase a: entrance stroke (top-left → down-right), then right-side half-circle (top → bottom)
     if (currentLetter.toLowerCase() === 'a') {
-      const ax = Rx, ay = Cy + 8;
-      
-      // Number 1 on entrance curve
-      tctx.fillText('①', ax + 20, ay - 80);
-      
-      // Number 2 on body circle
-      tctx.fillText('②', ax - 40, ay + 20);
-    }
+      // Tweak ukuran ini agar pas dengan ukuran font Anda
+      const r = 46;            // Jari-jari lingkaran perut 'a' (adjusted per request)
+      const xOffset = 20;      // Geser sedikit ke kiri dari titik tengah Rx
+      const yOffset = 20;      // Geser sedikit ke bawah agar pas di tengah x-height
 
+      // Tambahan offset global untuk merapikan semua garis huruf kecil 'a'
+      const smallShiftX = 12;  // geser ke kanan
+      const smallShiftY = 10;   // geser ke bawah
+
+      const ax = Rx - xOffset + smallShiftX;
+      const ay = Cy + yOffset + smallShiftY;
+
+      // Langkah 1: Perut 'a' (Lingkaran/Arc)
+      // Tambahan: Garis panduan masuk (tanpa nomor) dari atas-kiri menuju titik awal arc
+      // Hitung titik awal arc
+      // shift the arc center slightly down so the top of the arc sits lower
+      const arcCenterYOffset = 12; // pixels to lower the arc's top
+      const arcAy = ay + arcCenterYOffset;
+      const startAngle = -0.3 * Math.PI;
+      // pull the lower end of the arc slightly up by using a small negative end angle
+      const endAngle = -1.1 * Math.PI;
+      const startArcX = ax + r * Math.cos(startAngle);
+      const startArcY = arcAy + r * Math.sin(startAngle);
+
+      // Garis panduan pendek untuk orientasi stem
+      const stemX_pre = ax + r - 5; // posisi tiang (digunakan untuk orientasi panduan)
+      const stemTopY_pre = ay - r;
+
+      // Draw a smooth loop through five anchor points (similar to d's ②)
+      function drawThroughPoints(pixelPts, label) {
+        if (!pixelPts || pixelPts.length < 2) return;
+        tctx.beginPath();
+        tctx.moveTo(pixelPts[0].px, pixelPts[0].py);
+        for (let i = 0; i < pixelPts.length - 1; i++) {
+          const p0 = pixelPts[i - 1] || pixelPts[i];
+          const p1 = pixelPts[i];
+          const p2 = pixelPts[i + 1];
+          const p3 = pixelPts[i + 2] || p2;
+          const cp1x = p1.px + (p2.px - p0.px) / 6;
+          const cp1y = p1.py + (p2.py - p0.py) / 6;
+          const cp2x = p2.px - (p3.px - p1.px) / 6;
+          const cp2y = p2.py - (p3.py - p1.py) / 6;
+          tctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.px, p2.py);
+        }
+        tctx.stroke();
+        // arrow at end
+        const last = pixelPts[pixelPts.length - 1];
+        const prev = pixelPts[pixelPts.length - 2] || pixelPts[0];
+        drawArrowHead(tctx, prev.px, prev.py, last.px, last.py, 12);
+        if (label) {
+          const mid = pixelPts[Math.floor(pixelPts.length / 2)];
+          tctx.fillText(label, mid.px, mid.py - 18);
+        }
+      }
+
+      // construct five anchor points for the loop around (ax, arcAy)
+      const a_pts = [
+        { px: ax + Math.round(r * 0.6), py: arcAy - Math.round(r * 1) },
+        { px: ax - Math.round(r * 0.1), py: arcAy - Math.round(r * 1) },
+        { px: ax - Math.round(r * 1.1), py: arcAy + Math.round(r * - 0.2) },
+        { px: ax - Math.round(r * 0.2), py: arcAy + Math.round(r * 0.8) },
+        { px: ax + Math.round(r * 0.7), py: arcAy + Math.round(r * 0.6) }
+      ];
+
+      drawThroughPoints(a_pts, '②');
+
+      // Small curved guide above the lowercase 'a' with an arrowhead at the right end
+      // This creates a short curve that bends slightly upward, ending with an arrow to show direction
+      try {
+        tctx.beginPath();
+        const topStartX = ax - r + 1;
+        // pull the small top curve up a bit (12px) without changing other layout
+        const topStartY = ay - r - 50;
+        const topEndX = stemX_pre + 15; // uses previously computed stemX_pre
+        const topEndY = ay - r - 48;
+        const cpX = (topStartX + topEndX) / 2;
+        const cpY = topStartY - 28; // control point above to make curve bend upward
+        tctx.lineWidth = 2;
+        tctx.strokeStyle = '#FF6B35';
+        tctx.moveTo(topStartX, topStartY);
+        tctx.quadraticCurveTo(cpX, cpY, topEndX, topEndY);
+        tctx.stroke();
+        // arrowhead at curve end
+        drawArrowHead(tctx, cpX, cpY, topEndX, topEndY, 10);
+        // restore stroke style/width for subsequent drawing
+        tctx.lineWidth = 2;
+        tctx.strokeStyle = '#FF6B35';
+      } catch (e) { /* best-effort guide, ignore if any issue */ }
+
+      // Panah untuk langkah 2 (di ujung bawah kurva) — label nomornya ditukar
+      // Kita hitung titik ujung kurva untuk menaruh panah
+      // label ② placed near the loop area (drawThroughPoints already labeled at midpoint)
+
+      // Langkah 2: Tiang 'a' (Garis lurus atas ke bawah)
+      // Posisi x tiang ada di sisi kanan lingkaran
+      const stemX = ax + r + 15; // -5 agar garis nempel dengan lingkaran
+      const stemTopY = ay - r;
+      const stemBotY = ay + r;
+
+      tctx.beginPath();
+      tctx.moveTo(stemX, stemTopY);
+      tctx.lineTo(stemX, stemBotY);
+      tctx.stroke();
+
+      // Panah untuk langkah 1 (di bawah tiang)
+      drawArrowHead(tctx, stemX, stemTopY, stemX, stemBotY, 12);
+      tctx.fillText('①', stemX + 30, ay); // Sekarang langkah 1
+    }
     tctx.restore();
   }
 }
@@ -535,5 +637,30 @@ window._huruf_helpers = {
   COVERAGE_THRESHOLD_PCT
 };
 
+// helper
+function getGlyphBounds(ctx, char, font, cx, cy) {
+  ctx.save();
+  ctx.font = font;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const img = ctx.getImageData(0, 0, CANVAS_W, CANVAS_H).data;
+  let minX = CANVAS_W, minY = CANVAS_H, maxX = 0, maxY = 0;
+
+  for (let y = 0; y < CANVAS_H; y++) {
+    for (let x = 0; x < CANVAS_W; x++) {
+      const i = (y * CANVAS_W + x) * 4;
+      if (img[i + 3] > 10 && (img[i] + img[i+1] + img[i+2]) < 200) {
+        minX = Math.min(minX, x);
+        maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  ctx.restore();
+  return { minX, minY, maxX, maxY };
+}
 
 

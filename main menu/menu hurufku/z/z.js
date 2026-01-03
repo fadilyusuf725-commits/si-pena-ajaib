@@ -1,5 +1,5 @@
-﻿/* huruf-script.js — for letter B
-   - adapted from A with B-specific stroke positions
+﻿/* huruf-script.js — for letter Z
+   - template adapted from other letters
 */
 
 /* ---------- CANVAS SETUP ---------- */
@@ -21,14 +21,15 @@ if (templateCanvas) {
 /* draw style for user */
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
-ctx.lineWidth = 30;
+ctx.lineWidth = 25;
 ctx.strokeStyle = '#134b78';
 
 /* audio */
 const BG_MUSIC = 'https://cdn.pixabay.com/download/audio/2025/03/30/audio_3d2ec07913.mp3?filename=spring-in-my-step-copyright-free-music-for-youtube-320726.mp3';
 const CHEER = 'https://www.myinstants.com/media/sounds/kids_cheering.mp3';
-const bgm = document.getElementById('bgm') || new Audio(BG_MUSIC);
-if (!document.getElementById('bgm')) bgm.loop = true;
+window.bgm = window.bgm || document.getElementById('bgm') || new Audio(BG_MUSIC);
+const bgm = window.bgm;
+bgm.loop = true;
 const cheerAudio = new Audio(CHEER); cheerAudio.preload = 'auto'; cheerAudio.volume = 0.9;
 
 /* UI elements (expected) */
@@ -36,6 +37,7 @@ const clearBtn = document.getElementById('clearBtn');
 const toggleGuideBtn = document.getElementById('toggleGuide') || document.getElementById('toggleGuideBtn');
 const nextBtn = document.getElementById('nextBtn');
 const homeBtn = document.getElementById('homeBtn');
+const backBtn = document.getElementById('backBtn');
 const musicBtn = document.getElementById('musicBtn') || document.getElementById('audioBtn');
 const starBtn = document.getElementById('starBtn');
 const traceFeedback = document.getElementById('traceFeedback');
@@ -46,8 +48,9 @@ const homeFooter = document.getElementById('homeFooter');
 let isDrawing = false;
 let showArrows = false;
 let cheerPlayed = false;
-
+let audioOn = (function(){ try { if (typeof window !== 'undefined' && window.__bgm_playing !== undefined) return !!window.__bgm_playing; const v = localStorage && localStorage.getItem ? localStorage.getItem('bgmPlaying') : null; return v === '1'; } catch(e){ return false; } })();
 let tooMessy = false; // flag for outside scribbles
+
 /* letter / progress */
 let currentLetter = 'Z';
 try { localStorage.setItem('lastVisitedFull', 'menu hurufku/z/z.html'); } catch(e){}
@@ -63,10 +66,10 @@ const SMALL_FONT = 350;
 
 /* sampling & percent thresholds */
 const SAMPLE_STEP = 3;
-const COVERAGE_THRESHOLD_PCT = 40; // percent required per glyph (easier for kids)
+const COVERAGE_THRESHOLD_PCT = 57; // percent required per glyph
 
 // Outside-ink detection
-const OUTSIDE_THRESHOLD_PCT = 50;
+const OUTSIDE_THRESHOLD_PCT = 60;
 const MIN_INK_SAMPLES = 20;
 
 
@@ -191,30 +194,11 @@ function renderGuideTemplate(withArrows = false) {
 
     const Lx = LEFT_CENTER_X, Rx = RIGHT_CENTER_X, Cy = GUIDE_CENTER_Y;
 
-    // Z: stroke order - top horizontal, diagonal, bottom horizontal (3 strokes)
-    if (currentLetter.toUpperCase() === 'Z') {
-      // Number 1 on top horizontal
-      tctx.fillText('①', Lx, Cy - 140);
-      
-      // Number 2 on diagonal
-      tctx.fillText('②', Lx, Cy);
-      
-      // Number 3 on bottom horizontal
-      tctx.fillText('③', Lx, Cy + 140);
-    }
+    // Per-letter numbering handled by shared `guides.js`.
 
-    // z: stroke order - top horizontal, diagonal, bottom horizontal (3 strokes)
-    if (currentLetter.toLowerCase() === 'z') {
-      // Number 1 on top
-      tctx.fillText('①', Rx, Cy - 60);
-      
-      // Number 2 on diagonal
-      tctx.fillText('②', Rx, Cy);
-      
-      // Number 3 on bottom
-      tctx.fillText('③', Rx, Cy + 60);
+    if (typeof drawLetterGuides === 'function') {
+      try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch(e){}
     }
-
     tctx.restore();
   }
 }
@@ -237,9 +221,19 @@ function drawGuideBackgroundOnDrawCanvas() {
     ctx.strokeText(currentLetter.toLowerCase(), RIGHT_CENTER_X, GUIDE_CENTER_Y);
     ctx.setLineDash([]);
   }
+
+  if (showArrows) {
+    tctx.save();
+    if (typeof drawLetterGuides === 'function') {
+      try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch(e){}
+    }
+    tctx.restore();
+  }
+
   ctx.restore();
 }
 
+// Initialize masks and initial guide render so letter shows immediately
 renderGlyphMasks();
 renderGuideTemplate(false);
 
@@ -255,7 +249,6 @@ function getPos(e, canvas) {
 
 drawCanvas.addEventListener('pointerdown', (ev) => {
   isDrawing = true;
-  
   const p = getPos(ev, drawCanvas);
   ctx.beginPath();
   ctx.moveTo(p.x, p.y);
@@ -277,39 +270,27 @@ drawCanvas.addEventListener('pointermove', (ev) => {
 
 /* ---------- Coverage evaluation ---------- */
 function evaluateCoverage() {
-
   /* NEW: jika sudah berhasil, langsung stop total */
-  if (cheerPlayed) {
-    return; // blokir semua perhitungan persentase selanjutnya
-  }
+  if (cheerPlayed) return;
 
-  // jika user sebelumnya membuat terlalu banyak coretan di luar area, minta hapus dulu
   if (tooMessy) {
     if (traceFeedback) traceFeedback.innerHTML = 'Terlalu banyak coretan di luar huruf  tekan "Hapus Coretan" dan coba lagi.';
     return;
   }
 
-  // read draw canvas pixels once
   let drawImg;
-  try {
-    drawImg = ctx.getImageData(0,0,CANVAS_W,CANVAS_H).data;
-  } catch (err) {
-    console.warn('evaluateCoverage getImageData failed', err);
-    return;
-  }
+  try { drawImg = ctx.getImageData(0,0,CANVAS_W,CANVAS_H).data; }
+  catch (err) { console.warn('evaluateCoverage getImageData failed', err); return; }
 
-  let leftHit = 0, rightHit = 0;
-  let totalInkSamples = 0;
+  let leftHit = 0, rightHit = 0, totalInkSamples = 0;
 
   for (let y = 0; y < CANVAS_H; y += SAMPLE_STEP) {
     for (let x = 0; x < CANVAS_W; x += SAMPLE_STEP) {
       const flat = y * CANVAS_W + x;
       const idx = flat * 4;
-
       const r = drawImg[idx], g = drawImg[idx+1], b = drawImg[idx+2], a = drawImg[idx+3];
       const isInk = (a > 20 && (r + g + b) < 700);
       if (!isInk) continue;
-
       totalInkSamples++;
       if (leftMaskPixels[flat]) leftHit++;
       if (rightMaskPixels[flat]) rightHit++;
@@ -324,25 +305,20 @@ function evaluateCoverage() {
       if (rightMaskPixels[flat]) sampledRightMask++;
     }
   }
+
   const leftPct = sampledLeftMask ? Math.round((leftHit / sampledLeftMask) * 100) : 0;
   const rightPct = sampledRightMask ? Math.round((rightHit / sampledRightMask) * 100) : 0;
 
-  // deteksi coretan di luar kedua mask
   const outsideHits = Math.max(0, totalInkSamples - (leftHit + rightHit));
   const outsidePct = totalInkSamples ? Math.round((outsideHits / totalInkSamples) * 100) : 0;
 
-  // Jika cukup banyak tinta dan persentase tinta di luar area melebihi ambang, tandai sebagai salah
   if (totalInkSamples >= MIN_INK_SAMPLES && outsidePct >= OUTSIDE_THRESHOLD_PCT) {
     tooMessy = true;
     if (traceFeedback) traceFeedback.innerHTML = `Terlalu banyak coretan di luar huruf (${outsidePct}% dari coretan). Tekan "Hapus Coretan" dan coba lagi.`;
-    try {
-      drawCanvas.style.boxShadow = '0 0 0 6px rgba(255,0,0,0.45)';
-      setTimeout(() => drawCanvas.style.boxShadow = '', 1200);
-    } catch(e){}
+    try { drawCanvas.style.boxShadow = '0 0 0 6px rgba(255,0,0,0.45)'; setTimeout(() => drawCanvas.style.boxShadow = '', 1200); } catch(e){}
     return;
   }
 
-  // UPDATE FEEDBACK hanya jika belum sukses
   if (!cheerPlayed && traceFeedback) {
     const label = (pct, sampled) => sampled === 0 ? 'N/A' : (pct >= COVERAGE_THRESHOLD_PCT ? 'Selesai' : (pct >= Math.floor(COVERAGE_THRESHOLD_PCT/2) ? 'Sebagian' : 'Belum'));
     traceFeedback.innerHTML = `Progres menulis — Besar: ${label(leftPct, sampledLeftMask)} | Kecil: ${label(rightPct, sampledRightMask)}`;
@@ -353,19 +329,11 @@ function evaluateCoverage() {
 
   if (leftOk && rightOk && !cheerPlayed) {
     cheerPlayed = true;
-
-    try {
-      cheerAudio.currentTime = 0;
-      cheerAudio.play().catch(()=>{});
-    } catch(e){}
-
+    try { cheerAudio.currentTime = 0; cheerAudio.play().catch(()=>{}); } catch(e){}
     spawnStars(20);
-
     progressLetters[currentLetter] = true;
     localStorage.setItem('progressLetters', JSON.stringify(progressLetters));
-
-    if (traceFeedback)
-      traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa ';
+    if (traceFeedback) traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa ';
   }
 
   updateGridDoneMark();
@@ -376,10 +344,9 @@ clearBtn.addEventListener('click', () => {
     ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
     renderGuideTemplate(showArrows);
     cheerPlayed = false;
-    
     tooMessy = false;
     try { drawCanvas.style.boxShadow = ''; } catch(e){};
-    traceFeedback.innerHTML = 'Coretan dibersihkan.';
+    if (traceFeedback) traceFeedback.innerHTML = 'Coretan dibersihkan.';
 });
 
 if (toggleGuideBtn) {
@@ -398,7 +365,8 @@ if (nextBtn) {
       const nextLower = next.toLowerCase();
       window.location.href = `../${nextLower}/${nextLower}.html`;
     } else {
-      window.location.href = '../hurufku.html';
+      // After Z, go back to the main menu rather than the letters overview
+      window.location.href = '../../main menu.html';
     }
   });
 }

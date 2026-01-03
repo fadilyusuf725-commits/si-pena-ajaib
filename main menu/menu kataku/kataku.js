@@ -350,7 +350,7 @@ mulaiBtn.onclick = () => {
 };
 
 /* MUSIC */
-let audioOn = false;
+let audioOn = (function(){ try { if (typeof window !== 'undefined' && window.__bgm_playing !== undefined) return !!window.__bgm_playing; const v = localStorage && localStorage.getItem ? localStorage.getItem('bgmPlaying') : null; return v === '1'; } catch(e){ return false; } })();
 audioBtn.onclick = () => {
   if (audioOn) bgm.pause();
   else bgm.play();
