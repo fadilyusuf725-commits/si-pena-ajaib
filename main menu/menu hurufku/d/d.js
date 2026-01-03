@@ -38,6 +38,7 @@ const clearBtn = document.getElementById('clearBtn');
 const toggleGuideBtn = document.getElementById('toggleGuide') || document.getElementById('toggleGuideBtn');
 const nextBtn = document.getElementById('nextBtn');
 const homeBtn = document.getElementById('homeBtn');
+const backBtn = document.getElementById('backBtn');
 const musicBtn = document.getElementById('musicBtn') || document.getElementById('audioBtn');
 const starBtn = document.getElementById('starBtn');
 const traceFeedback = document.getElementById('traceFeedback');
@@ -207,7 +208,7 @@ function drawGuideBackgroundOnDrawCanvas() {
   ctx.fillStyle = '#fff';
   ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
 
-  if (withArrows) {
+  if (showArrows) {
     tctx.save();
     if (typeof drawLetterGuides === 'function') {
       try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch(e){}
@@ -220,6 +221,16 @@ function drawGuideBackgroundOnDrawCanvas() {
 // Initialize masks and initial guide render so letter shows immediately
 renderGlyphMasks();
 renderGuideTemplate(false);
+
+/* ---------- Drawing helpers ---------- */
+function getPos(e, canvas) {
+  const r = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return {
+    x: (t.clientX - r.left) * (canvas.width / r.width),
+    y: (t.clientY - r.top) * (canvas.height / r.height)
+  };
+}
 
 drawCanvas.addEventListener('pointerdown', (ev) => {
   isDrawing = true;
