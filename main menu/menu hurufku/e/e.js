@@ -63,8 +63,16 @@ const GUIDE_CENTER_Y = Math.round(CANVAS_H * 0.52);
 
 const BIG_FONT = 350;
 const SMALL_FONT = 350;
-
 /* sampling & percent thresholds */
+const SAMPLE_STEP = 3;
+const COVERAGE_THRESHOLD_PCT = 60; // percent required per glyph
+
+// Outside-ink detection
+const OUTSIDE_THRESHOLD_PCT = 60;
+const MIN_INK_SAMPLES = 20;
+
+let leftMaskPixels = null;
+let rightMaskPixels = null;
 let leftMaskCount = 0;
 let rightMaskCount = 0;
 

@@ -162,27 +162,23 @@
         drawThroughPoints(D_pts, '②');
         break;
       case 'E':
-        // E: expose endpoints
-        const e1_cart = pxToCart(Lx - 80, topY);
-        const e2_cart = pxToCart(Lx - 80, botY);
-        const e1p = cartToPx(e1_cart.x, e1_cart.y);
-        const e2p = cartToPx(e2_cart.x, e2_cart.y);
-        straight(e1p.px, e1p.py, e2p.px, e2p.py, '①');
-        const e3_cart = pxToCart(Lx - 80, topY);
-        const e4_cart = pxToCart(Lx + 20, topY);
-        const e3p = cartToPx(e3_cart.x, e3_cart.y);
-        const e4p = cartToPx(e4_cart.x, e4_cart.y);
-        straight(e3p.px, e3p.py, e4p.px, e4p.py, '②');
-        const e5_cart = pxToCart(Lx - 80, midY);
-        const e6_cart = pxToCart(Lx + 10, midY);
-        const e5p = cartToPx(e5_cart.x, e5_cart.y);
-        const e6p = cartToPx(e6_cart.x, e6_cart.y);
-        straight(e5p.px, e5p.py, e6p.px, e6p.py, '③');
-        const e7_cart = pxToCart(Lx - 80, botY);
-        const e8_cart = pxToCart(Lx + 20, botY);
-        const e7p = cartToPx(e7_cart.x, e7_cart.y);
-        const e8p = cartToPx(e8_cart.x, e8_cart.y);
-        straight(e7p.px, e7p.py, e8p.px, e8p.py, '④');
+        // E: simplified stem + three horizontals (top, middle, bottom)
+        // stem
+        const eStemTop = norm(Lx - 80, topY);
+        const eStemBot = norm(Lx - 80, botY);
+        straight(eStemTop.px, eStemTop.py, eStemBot.px, eStemBot.py, '①');
+        // top bar
+        const eTopStart = norm(Lx - 80, topY);
+        const eTopEnd = norm(Lx + 60, topY);
+        straight(eTopStart.px, eTopStart.py, eTopEnd.px, eTopEnd.py, '②');
+        // middle bar
+        const eMidStart = norm(Lx - 80, midY);
+        const eMidEnd = norm(Lx + 30, midY);
+        straight(eMidStart.px, eMidStart.py, eMidEnd.px, eMidEnd.py, '③');
+        // bottom bar
+        const eBotStart = norm(Lx - 80, botY);
+        const eBotEnd = norm(Lx + 60, botY);
+        straight(eBotStart.px, eBotStart.py, eBotEnd.px, eBotEnd.py, '④');
         break;
       case 'F':
         const f1p = norm(Lx - 80, topY);
@@ -512,6 +508,15 @@
         const dpt4 = norm(Rx - 40, midY + 70);
         const dpt5 = norm(Rx + 10, midY + 75);
         drawThroughPoints([dpt1, dpt2, dpt3, dpt4, dpt5], '②');
+        break;
+      case 'e':
+        // small e: a rounded loop; single smooth spline through five anchors
+        const e_small_p1 = norm(Rx + 30, midY - 20);
+        const e_small_p2 = norm(Rx + 10, midY - 30);
+        const e_small_p3 = norm(Rx - 10, midY - 6);
+        const e_small_p4 = norm(Rx - 20, midY + 22);
+        const e_small_p5 = norm(Rx + 10, midY + 28);
+        drawThroughPoints([e_small_p1, e_small_p2, e_small_p3, e_small_p4, e_small_p5], '①');
         break;
       // more lowercase approximations can be added as needed
       default:
