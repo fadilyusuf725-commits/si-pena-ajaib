@@ -519,10 +519,141 @@
         drawThroughPoints([e_small_p1, e_small_p2, e_small_p3, e_small_p4, e_small_p5], '①');
         // Add a short straight directional guide showing initial leftward stroke
         try {
-          const e_line_start = norm(Rx + 95, midY - 30);
-          const e_line_end = norm(Rx + 30, midY - 30);
+          const e_line_start = norm(Rx - 40, midY - 6);
+          const e_line_end = norm(Rx + 69, midY - 6);
           straight(e_line_start.px, e_line_start.py, e_line_end.px, e_line_end.py, '②');
         } catch (e) { /* ignore if drawing fails */ }
+        break;
+      case 'f':
+        // small f: top bar and vertical stem
+        const f_top_s = norm(Rx - 40, topY - 10);
+        const f_top_e = norm(Rx + 20, topY - 10);
+        straight(f_top_s.px, f_top_s.py, f_top_e.px, f_top_e.py, '①');
+        const f_stem_s = norm(Rx - 10, topY - 40);
+        const f_stem_e = norm(Rx - 10, botY + 10);
+        straight(f_stem_s.px, f_stem_s.py, f_stem_e.px, f_stem_e.py, '②');
+        break;
+      case 'g':
+        // small g: round loop + tail
+        const g1 = norm(Rx + 40, midY - 20);
+        const g2 = norm(Rx + 10, midY - 40);
+        const g3 = norm(Rx - 40, midY - 6);
+        const g4 = norm(Rx - 10, midY + 34);
+        const g5 = norm(Rx + 40, midY + 40);
+        drawThroughPoints([g1, g2, g3, g4, g5], '①');
+        // small tail
+        straight(g5.px, g5.py, norm(Rx + 70, midY + 70).px, norm(Rx + 70, midY + 70).py, '②');
+        break;
+      case 'h':
+        // small h: stem + right arch
+        const h1 = norm(Rx - 60, topY - 10);
+        const h2 = norm(Rx - 60, botY + 10);
+        straight(h1.px, h1.py, h2.px, h2.py, '①');
+        const h_a1 = norm(Rx - 10, midY - 10);
+        const h_a2 = norm(Rx + 40, midY + 40);
+        drawThroughPoints([h_a1, norm(Rx + 10, midY - 10), h_a2], '②');
+        break;
+      case 'i':
+        // small i: short vertical + dot
+        const i1 = norm(Rx + 10, topY - 20);
+        const i2 = norm(Rx + 10, midY + 40);
+        straight(i1.px, i1.py, i2.px, i2.py, '①');
+        try { const dot = cartToPx(...Object.values(pxToCart(Rx + 10, topY - 36))); tctx.fillText('●', dot.px, dot.py); } catch(e){}
+        break;
+      case 'j':
+        // small j: downward tail
+        const j1 = norm(Rx + 30, topY - 10);
+        const j2 = norm(Rx + 30, botY + 40);
+        drawThroughPoints([j1, norm(Rx + 30, midY), j2], '①');
+        break;
+      case 'k':
+        // small k: stem + two diagonals
+        const k_stem1 = norm(Rx - 60, topY - 10);
+        const k_stem2 = norm(Rx - 60, botY + 10);
+        straight(k_stem1.px, k_stem1.py, k_stem2.px, k_stem2.py, '①');
+        straight(norm(Rx - 20, midY - 10).px, norm(Rx - 20, midY - 10).py, norm(Rx + 30, topY + 10).px, norm(Rx + 30, topY + 10).py, '②');
+        straight(norm(Rx - 20, midY + 10).px, norm(Rx - 20, midY + 10).py, norm(Rx + 30, botY - 10).px, norm(Rx + 30, botY - 10).py, '③');
+        break;
+      case 'l':
+        // small l: simple vertical
+        straight(norm(Rx, topY - 20).px, norm(Rx, topY - 20).py, norm(Rx, botY + 20).px, norm(Rx, botY + 20).py, '①');
+        break;
+      case 'm':
+        // small m: series of humps
+        const m1 = norm(Rx - 60, midY + 40);
+        const m2 = norm(Rx - 20, midY - 10);
+        const m3 = norm(Rx + 20, midY + 40);
+        const m4 = norm(Rx + 60, midY - 10);
+        const m5 = norm(Rx + 100, midY + 40);
+        drawThroughPoints([m1, m2, m3, m4, m5], '①');
+        break;
+      case 'n':
+        // small n: up then down
+        const n1 = norm(Rx - 60, midY + 40);
+        const n2 = norm(Rx - 20, midY - 10);
+        const n3 = norm(Rx + 20, midY + 40);
+        drawThroughPoints([n1, n2, n3], '①');
+        break;
+      case 'o':
+        // small o: circular loop
+        const o1 = norm(Rx, midY - 40);
+        const o2 = norm(Rx - 40, midY);
+        const o3 = norm(Rx, midY + 40);
+        const o4 = norm(Rx + 40, midY);
+        drawThroughPoints([o1, o2, o3, o4, o1], '①');
+        break;
+      case 'p':
+        // small p: stem + loop above baseline
+        straight(norm(Rx - 60, topY - 10).px, norm(Rx - 60, topY - 10).py, norm(Rx - 60, midY + 40).px, norm(Rx - 60, midY + 40).py, '①');
+        drawThroughPoints([norm(Rx - 20, topY + 10), norm(Rx + 20, topY + 10), norm(Rx + 20, midY + 30), norm(Rx - 20, midY + 30), norm(Rx - 20, topY + 10)], '②');
+        break;
+      case 'q':
+        // small q: circle + tail down-right
+        drawThroughPoints([norm(Rx, midY - 40), norm(Rx - 40, midY), norm(Rx, midY + 40), norm(Rx + 40, midY)], '①');
+        straight(norm(Rx + 40, midY).px, norm(Rx + 40, midY).py, norm(Rx + 70, midY + 50).px, norm(Rx + 70, midY + 50).py, '②');
+        break;
+      case 'r':
+        // small r: short stem + arc
+        straight(norm(Rx - 60, midY - 10).px, norm(Rx - 60, midY - 10).py, norm(Rx - 60, midY + 40).px, norm(Rx - 60, midY + 40).py, '①');
+        drawThroughPoints([norm(Rx - 20, midY - 10), norm(Rx + 10, midY), norm(Rx - 10, midY + 20)], '②');
+        break;
+      case 's':
+        // small s: S-curve
+        drawThroughPoints([norm(Rx + 30, midY - 30), norm(Rx - 10, midY - 10), norm(Rx + 20, midY + 20), norm(Rx - 10, midY + 40)], '①');
+        break;
+      case 't':
+        // small t: vertical + short top
+        straight(norm(Rx, topY - 20).px, norm(Rx, topY - 20).py, norm(Rx, botY + 10).px, norm(Rx, botY + 10).py, '①');
+        straight(norm(Rx - 30, topY - 30).px, norm(Rx - 30, topY - 30).py, norm(Rx + 30, topY - 30).px, norm(Rx + 30, topY - 30).py, '②');
+        break;
+      case 'u':
+        // small u: gentle U-shape
+        drawThroughPoints([norm(Rx - 40, midY - 10), norm(Rx - 20, midY + 40), norm(Rx + 20, midY + 40), norm(Rx + 40, midY - 10)], '①');
+        break;
+      case 'v':
+        // small v: simple vee
+        straight(norm(Rx - 40, topY).px, norm(Rx - 40, topY).py, norm(Rx, botY).px, norm(Rx, botY).py, '①');
+        straight(norm(Rx, botY).px, norm(Rx, botY).py, norm(Rx + 40, topY).px, norm(Rx + 40, topY).py, '②');
+        break;
+      case 'w':
+        // small w: double vee
+        drawThroughPoints([norm(Rx - 80, topY), norm(Rx - 40, botY), norm(Rx, topY), norm(Rx + 40, botY), norm(Rx + 80, topY)], '①');
+        break;
+      case 'x':
+        // small x: crossing lines
+        straight(norm(Rx - 40, topY).px, norm(Rx - 40, topY).py, norm(Rx + 40, botY).px, norm(Rx + 40, botY).py, '①');
+        straight(norm(Rx + 40, topY).px, norm(Rx + 40, topY).py, norm(Rx - 40, botY).px, norm(Rx - 40, botY).py, '②');
+        break;
+      case 'y':
+        // small y: upper vee + descending tail
+        drawThroughPoints([norm(Rx - 40, topY), norm(Rx, midY), norm(Rx + 40, topY)], '①');
+        straight(norm(Rx, midY).px, norm(Rx, midY).py, norm(Rx, midY + 80).px, norm(Rx, midY + 80).py, '②');
+        break;
+      case 'z':
+        // small z: zig-zag
+        straight(norm(Rx - 40, topY).px, norm(Rx - 40, topY).py, norm(Rx + 40, topY).px, norm(Rx + 40, topY).py, '①');
+        straight(norm(Rx + 40, topY).px, norm(Rx + 40, topY).py, norm(Rx - 40, botY).px, norm(Rx - 40, botY).py, '②');
+        straight(norm(Rx - 40, botY).px, norm(Rx - 40, botY).py, norm(Rx + 40, botY).px, norm(Rx + 40, botY).py, '③');
         break;
       // more lowercase approximations can be added as needed
       default:
