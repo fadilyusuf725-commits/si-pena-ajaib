@@ -21,7 +21,7 @@ if (templateCanvas) {
 /* draw style for user */
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
-ctx.lineWidth = 25;
+ctx.lineWidth = 27;
 ctx.strokeStyle = '#134b78';
 
 /* audio */
