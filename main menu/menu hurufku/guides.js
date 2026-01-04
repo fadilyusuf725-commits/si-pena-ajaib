@@ -164,20 +164,20 @@
       case 'E':
         // E: simplified stem + three horizontals (top, middle, bottom)
         // stem
-        const eStemTop = norm(Lx - 80, topY);
-        const eStemBot = norm(Lx - 80, botY);
+        const eStemTop = norm(Lx - 57, topY + 15);
+        const eStemBot = norm(Lx - 57, botY - 70);
         straight(eStemTop.px, eStemTop.py, eStemBot.px, eStemBot.py, '①');
         // top bar
-        const eTopStart = norm(Lx - 80, topY);
-        const eTopEnd = norm(Lx + 60, topY);
+        const eTopStart = norm(Lx - 60, topY + 10);
+        const eTopEnd = norm(Lx + 60, topY + 10);
         straight(eTopStart.px, eTopStart.py, eTopEnd.px, eTopEnd.py, '②');
         // middle bar
-        const eMidStart = norm(Lx - 80, midY);
-        const eMidEnd = norm(Lx + 30, midY);
+        const eMidStart = norm(Lx - 40, midY - 40);
+        const eMidEnd = norm(Lx + 50, midY - 40);
         straight(eMidStart.px, eMidStart.py, eMidEnd.px, eMidEnd.py, '③');
         // bottom bar
-        const eBotStart = norm(Lx - 80, botY);
-        const eBotEnd = norm(Lx + 60, botY);
+        const eBotStart = norm(Lx - 60, botY - 70);
+        const eBotEnd = norm(Lx + 60, botY - 70);
         straight(eBotStart.px, eBotStart.py, eBotEnd.px, eBotEnd.py, '④');
         break;
       case 'F':
@@ -511,12 +511,18 @@
         break;
       case 'e':
         // small e: a rounded loop; single smooth spline through five anchors
-        const e_small_p1 = norm(Rx + 30, midY - 20);
-        const e_small_p2 = norm(Rx + 10, midY - 30);
-        const e_small_p3 = norm(Rx - 10, midY - 6);
-        const e_small_p4 = norm(Rx - 20, midY + 22);
-        const e_small_p5 = norm(Rx + 10, midY + 28);
+        const e_small_p1 = norm(Rx + 70, midY - 30);
+        const e_small_p2 = norm(Rx + 10, midY - 80);
+        const e_small_p3 = norm(Rx - 68, midY - 17);
+        const e_small_p4 = norm(Rx - 20, midY + 72);
+        const e_small_p5 = norm(Rx + 60, midY + 65);
         drawThroughPoints([e_small_p1, e_small_p2, e_small_p3, e_small_p4, e_small_p5], '①');
+        // Add a short straight directional guide showing initial leftward stroke
+        try {
+          const e_line_start = norm(Rx + 95, midY - 30);
+          const e_line_end = norm(Rx + 30, midY - 30);
+          straight(e_line_start.px, e_line_start.py, e_line_end.px, e_line_end.py, '②');
+        } catch (e) { /* ignore if drawing fails */ }
         break;
       // more lowercase approximations can be added as needed
       default:
