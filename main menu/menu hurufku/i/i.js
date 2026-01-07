@@ -223,6 +223,15 @@ function drawGuideBackgroundOnDrawCanvas() {
 renderGlyphMasks();
 renderGuideTemplate(false);
 
+function getPos(e, canvas) {
+  const r = canvas.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  return {
+    x: (t.clientX - r.left) * (canvas.width / r.width),
+    y: (t.clientY - r.top) * (canvas.height / r.height)
+  };
+}
+
 drawCanvas.addEventListener('pointerdown', (ev) => {
   isDrawing = true;
   

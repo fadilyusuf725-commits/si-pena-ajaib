@@ -181,122 +181,125 @@
         straight(eBotStart.px, eBotStart.py, eBotEnd.px, eBotEnd.py, '④');
         break;
       case 'F':
-        const f1p = norm(Lx - 80, topY);
-        const f2p = norm(Lx - 80, botY);
+        const f1p = norm(Lx - 52, topY + 10);
+        const f2p = norm(Lx - 52, botY - 60);
         straight(f1p.px, f1p.py, f2p.px, f2p.py, '①');
-        const f3p = norm(Lx - 80, topY);
-        const f4p = norm(Lx + 20, topY);
+        const f3p = norm(Lx - 53, topY + 10);
+        const f4p = norm(Lx + 70, topY + 10);
         straight(f3p.px, f3p.py, f4p.px, f4p.py, '②');
-        const f5p = norm(Lx - 80, midY);
-        const f6p = norm(Lx + 10, midY);
+        const f5p = norm(Lx - 53, midY - 40);
+        const f6p = norm(Lx + 60, midY - 40);
         straight(f5p.px, f5p.py, f6p.px, f6p.py, '③');
         break;
       case 'G':
-        const g1_cart = pxToCart(Lx + 40, midY - 80);
-        const g2_cart = pxToCart(Lx - 20, midY - 120);
-        const g3_cart = pxToCart(Lx + 40, midY + 60);
-        const g1p = cartToPx(g1_cart.x, g1_cart.y);
-        const g2p = cartToPx(g2_cart.x, g2_cart.y);
-        const g3p = cartToPx(g3_cart.x, g3_cart.y);
-        const gcpx = 2 * g2p.px - 0.5 * (g1p.px + g3p.px);
-        const gcpy = 2 * g2p.py - 0.5 * (g1p.py + g3p.py);
-        curve(g1p.px, g1p.py, gcpx, gcpy, g3p.px, g3p.py, 12, '①');
-        const g4p = norm(Lx + 10, midY);
-        const g5p = norm(Lx + 60, midY);
+        // G1: outer curve through five editable anchors for finer control
+        const G_pts = [
+          norm(Lx + 75, midY - 140),
+          norm(Lx - 53, midY - 135),
+          norm(Lx - 80, midY + 30),
+          norm(Lx + 70, midY + 72),
+          norm(Lx + 84, midY - 25)
+        ];
+        drawThroughPoints(G_pts, '①');
+        const g4p = norm(Lx + 89, midY - 32);
+        const g5p = norm(Lx + 18, midY - 32);
         straight(g4p.px, g4p.py, g5p.px, g5p.py, '②');
         break;
       case 'H':
-        const h1p = norm(Lx - 100, topY);
-        const h2p = norm(Lx - 100, botY);
+        const h1p = norm(Lx - 88, topY + 10);
+        const h2p = norm(Lx - 88, botY - 65);
         straight(h1p.px, h1p.py, h2p.px, h2p.py, '①');
-        const h3p = norm(Lx + 20, topY);
-        const h4p = norm(Lx + 20, botY);
-        straight(h3p.px, h3p.py, h4p.px, h4p.py, '②');
-        const h5p = norm(Lx - 100, midY);
-        const h6p = norm(Lx + 20, midY);
-        straight(h5p.px, h5p.py, h6p.px, h6p.py, '③');
+        const h3p = norm(Lx + 88, topY + 10);
+        const h4p = norm(Lx + 88, botY - 65);
+        straight(h3p.px, h3p.py, h4p.px, h4p.py, '③');
+        const h5p = norm(Lx - 70, midY - 40);
+        const h6p = norm(Lx + 70, midY - 40);
+        straight(h5p.px, h5p.py, h6p.px, h6p.py, '②');
         break;
       case 'I':
-        const i1p = norm(Lx, topY);
-        const i2p = norm(Lx, botY);
+        const i1p = norm(Lx, topY + 10);
+        const i2p = norm(Lx, botY - 65);
         straight(i1p.px, i1p.py, i2p.px, i2p.py, '①');
         break;
       case 'J':
-        const j1p = cartToPx(...Object.values(pxToCart(Lx + 60, topY)));
-        const j2p = cartToPx(...Object.values(pxToCart(Lx + 60, midY)));
-        straight(j1p.px, j1p.py, j2p.px, j2p.py, '①');
-        const j3_cart = pxToCart(Lx + 60, midY + 20);
-        const j4_cart = pxToCart(Lx + 20, botY);
-        const j5_cart = pxToCart(Lx - 20, botY - 10);
+        const j3_cart = pxToCart(Lx + 10, topY + 10);
+        const j4_cart = pxToCart(Lx + 7, midY + 33);
+        const j5_cart = pxToCart(Lx - 45, botY - 69);
         const j3p = cartToPx(j3_cart.x, j3_cart.y);
         const j4p = cartToPx(j4_cart.x, j4_cart.y);
         const j5p = cartToPx(j5_cart.x, j5_cart.y);
         const jcpx = 2 * j4p.px - 0.5 * (j3p.px + j5p.px);
         const jcpy = 2 * j4p.py - 0.5 * (j3p.py + j5p.py);
-        curve(j3p.px, j3p.py, jcpx, jcpy, j5p.px, j5p.py, 12, '②');
+        curve(j3p.px, j3p.py, jcpx, jcpy, j5p.px, j5p.py, 12, '①');
         break;
       case 'K':
-        const k1p = norm(Lx - 100, topY);
-        const k2p = norm(Lx - 100, botY);
+        const k1p = norm(Lx - 65, topY + 10);
+        const k2p = norm(Lx - 65, botY - 65);
         straight(k1p.px, k1p.py, k2p.px, k2p.py, '①');
-        const k3p = norm(Lx - 10, midY);
-        const k4p = norm(Lx + 40, topY);
+        const k3p = norm(Lx - 50, midY - 36);
+        const k4p = norm(Lx + 85, topY + 2);
         straight(k3p.px, k3p.py, k4p.px, k4p.py, '②');
-        const k5p = norm(Lx - 10, midY);
-        const k6p = norm(Lx + 40, botY);
+        const k5p = norm(Lx - 40, midY - 40);
+        const k6p = norm(Lx + 85, botY - 65);
         straight(k5p.px, k5p.py, k6p.px, k6p.py, '③');
         break;
       case 'L':
-        const l1p = norm(Lx - 100, topY);
-        const l2p = norm(Lx - 100, botY);
+        const l1p = norm(Lx - 50, topY + 10);
+        const l2p = norm(Lx - 50, botY - 75);
         straight(l1p.px, l1p.py, l2p.px, l2p.py, '①');
-        const l3p = norm(Lx - 100, botY);
-        const l4p = norm(Lx + 20, botY);
+        const l3p = norm(Lx - 50, botY - 68);
+        const l4p = norm(Lx + 80, botY - 68);
         straight(l3p.px, l3p.py, l4p.px, l4p.py, '②');
         break;
       case 'M':
-        const m1p = norm(Lx - 100, botY);
-        const m2p = norm(Lx - 100, topY);
+        const m1p = norm(Lx - 107, botY - 65);
+        const m2p = norm(Lx - 107, topY + 10);
         straight(m1p.px, m1p.py, m2p.px, m2p.py, '①');
-        const m3p = norm(Lx - 100, topY);
-        const m4p = norm(Lx - 20, midY);
+        const m3p = norm(Lx - 100, topY + 10);
+        const m4p = norm(Lx - 0, midY + 37);
         straight(m3p.px, m3p.py, m4p.px, m4p.py, '②');
-        const m5p = norm(Lx - 20, midY);
-        const m6p = norm(Lx + 60, topY);
+        const m5p = norm(Lx + 10, midY + 21);
+        const m6p = norm(Lx + 100, topY + 10);
         straight(m5p.px, m5p.py, m6p.px, m6p.py, '③');
-        const m7p = norm(Lx + 60, topY);
-        const m8p = norm(Lx + 60, botY);
+        const m7p = norm(Lx + 107, topY + 10);
+        const m8p = norm(Lx + 107, botY - 65);
         straight(m7p.px, m7p.py, m8p.px, m8p.py, '④');
         break;
       case 'N':
-        const n1p = norm(Lx - 100, botY);
-        const n2p = norm(Lx - 100, topY);
+        const n1p = norm(Lx - 87, botY - 65);
+        const n2p = norm(Lx - 87, topY + 10);
         straight(n1p.px, n1p.py, n2p.px, n2p.py, '①');
-        const n3p = norm(Lx - 100, topY);
-        const n4p = norm(Lx + 60, botY);
+        const n3p = norm(Lx - 82, topY + 10);
+        const n4p = norm(Lx + 84, botY - 65);
         straight(n3p.px, n3p.py, n4p.px, n4p.py, '②');
-        const n5p = norm(Lx + 60, botY);
-        const n6p = norm(Lx + 60, topY);
+        const n5p = norm(Lx + 87, botY - 65);
+        const n6p = norm(Lx + 87, topY + 10);
         straight(n5p.px, n5p.py, n6p.px, n6p.py, '③');
         break;
       case 'O':
-        const o1_cart = pxToCart(Lx, midY - 120);
-        const o2_cart = pxToCart(Lx - 80, midY);
-        const o3_cart = pxToCart(Lx, midY + 120);
-        const o1p = cartToPx(o1_cart.x, o1_cart.y);
-        const o2p = cartToPx(o2_cart.x, o2_cart.y);
-        const o3p = cartToPx(o3_cart.x, o3_cart.y);
-        const ocpx = 2 * o2p.px - 0.5 * (o1p.px + o3p.px);
-        const ocpy = 2 * o2p.py - 0.5 * (o1p.py + o3p.py);
-        curve(o1p.px, o1p.py, ocpx, ocpy, o3p.px, o3p.py, 12, '①');
+        // Draw a full circular guide with an arrow at the end
+        try {
+          semicircle(Lx, midY - 40, 108, -Math.PI/2, -Math.PI/2 + Math.PI * 1.9, '①');
+        } catch (e) {
+          // fallback to previous three-point curve
+          const o1_cart = pxToCart(Lx, midY - 120);
+          const o2_cart = pxToCart(Lx - 80, midY - 120);
+          const o3_cart = pxToCart(Lx, midY + 120);
+          const o1p = cartToPx(o1_cart.x, o1_cart.y);
+          const o2p = cartToPx(o2_cart.x, o2_cart.y);
+          const o3p = cartToPx(o3_cart.x, o3_cart.y);
+          const ocpx = 2 * o2p.px - 0.5 * (o1p.px + o3p.px);
+          const ocpy = 2 * o2p.py - 0.5 * (o1p.py + o3p.py);
+          curve(o1p.px, o1p.py, ocpx, ocpy, o3p.px, o3p.py, 12, '①');
+        }
         break;
       case 'P':
-        const p1p = norm(Lx - 100, botY);
-        const p2p = norm(Lx - 100, topY);
+        const p1p = norm(Lx - 67, topY + 10);
+        const p2p = norm(Lx - 67, botY - 65);
         straight(p1p.px, p1p.py, p2p.px, p2p.py, '①');
-        const p3_cart = pxToCart(Lx - 60, topY + 30);
-        const p4_cart = pxToCart(Lx + 10, midY);
-        const p5_cart = pxToCart(Lx - 60, midY + 30);
+        const p3_cart = pxToCart(Lx - 60, topY + 10);
+        const p4_cart = pxToCart(Lx + 80, midY - 80);
+        const p5_cart = pxToCart(Lx - 60, midY - 25);
         const p3p = cartToPx(p3_cart.x, p3_cart.y);
         const p4p = cartToPx(p4_cart.x, p4_cart.y);
         const p5p = cartToPx(p5_cart.x, p5_cart.y);
@@ -305,15 +308,20 @@
         curve(p3p.px, p3p.py, pcpx, pcpy, p5p.px, p5p.py, 12, '②');
         break;
       case 'Q':
-        const q1_cart = pxToCart(Lx, midY - 120);
-        const q2_cart = pxToCart(Lx - 80, midY);
-        const q3_cart = pxToCart(Lx, midY + 120);
-        const q1p = cartToPx(q1_cart.x, q1_cart.y);
-        const q2p = cartToPx(q2_cart.x, q2_cart.y);
-        const q3p = cartToPx(q3_cart.x, q3_cart.y);
-        const qcpx = 2 * q2p.px - 0.5 * (q1p.px + q3p.px);
-        const qcpy = 2 * q2p.py - 0.5 * (q1p.py + q3p.py);
-        curve(q1p.px, q1p.py, qcpx, qcpy, q3p.px, q3p.py, 12, '①');
+        // Circle guide with arrow, plus a tail for the Q
+        try {
+          semicircle(Lx, midY, 120, -Math.PI/2, -Math.PI/2 + Math.PI * 2, '①');
+        } catch (e) {
+          const q1_cart = pxToCart(Lx, midY - 120);
+          const q2_cart = pxToCart(Lx - 80, midY);
+          const q3_cart = pxToCart(Lx, midY + 120);
+          const q1p = cartToPx(q1_cart.x, q1_cart.y);
+          const q2p = cartToPx(q2_cart.x, q2_cart.y);
+          const q3p = cartToPx(q3_cart.x, q3_cart.y);
+          const qcpx = 2 * q2p.px - 0.5 * (q1p.px + q3p.px);
+          const qcpy = 2 * q2p.py - 0.5 * (q1p.py + q3p.py);
+          curve(q1p.px, q1p.py, qcpx, qcpy, q3p.px, q3p.py, 12, '①');
+        }
         const q4p = norm(Lx + 30, midY + 60);
         const q5p = norm(Lx + 80, midY + 120);
         straight(q4p.px, q4p.py, q5p.px, q5p.py, '②');
@@ -516,91 +524,142 @@
         const e_small_p3 = norm(Rx - 68, midY - 17);
         const e_small_p4 = norm(Rx - 20, midY + 72);
         const e_small_p5 = norm(Rx + 60, midY + 65);
-        drawThroughPoints([e_small_p1, e_small_p2, e_small_p3, e_small_p4, e_small_p5], '①');
+        drawThroughPoints([e_small_p1, e_small_p2, e_small_p3, e_small_p4, e_small_p5], '②');
         // Add a short straight directional guide showing initial leftward stroke
         try {
           const e_line_start = norm(Rx - 40, midY - 6);
           const e_line_end = norm(Rx + 69, midY - 6);
-          straight(e_line_start.px, e_line_start.py, e_line_end.px, e_line_end.py, '②');
+          straight(e_line_start.px, e_line_start.py, e_line_end.px, e_line_end.py, '①');
         } catch (e) { /* ignore if drawing fails */ }
         break;
       case 'f':
         // small f: top bar and vertical stem
-        const f_top_s = norm(Rx - 40, topY - 10);
-        const f_top_e = norm(Rx + 20, topY - 10);
+        const f_top_s = norm(Rx - 50, topY + 86);
+        const f_top_e = norm(Rx + 45, topY + 86);
         straight(f_top_s.px, f_top_s.py, f_top_e.px, f_top_e.py, '①');
-        const f_stem_s = norm(Rx - 10, topY - 40);
-        const f_stem_e = norm(Rx - 10, botY + 10);
-        straight(f_stem_s.px, f_stem_s.py, f_stem_e.px, f_stem_e.py, '②');
+        const f_stem_s = norm(Rx + 50, topY + 5);
+        const f_stem_e = norm(Rx - 10, botY - 60);
+        // make the stem slightly curved near the top for a gentler shape
+        try {
+          // use a normalized control point (cartesian-relative) for more predictable curvature
+          const f_cp = norm(Rx - 30, topY - 10 );
+          curve(f_stem_s.px, f_stem_s.py, f_cp.px, f_cp.py, f_stem_e.px, f_stem_e.py, 12, '②');
+        } catch (e) {
+          // fallback to straight if anything goes wrong
+          straight(f_stem_s.px, f_stem_s.py, f_stem_e.px, f_stem_e.py, '②');
+        }
         break;
       case 'g':
         // small g: round loop + tail
-        const g1 = norm(Rx + 40, midY - 20);
-        const g2 = norm(Rx + 10, midY - 40);
-        const g3 = norm(Rx - 40, midY - 6);
-        const g4 = norm(Rx - 10, midY + 34);
-        const g5 = norm(Rx + 40, midY + 40);
+        const g1 = norm(Rx + 50, midY - 50);
+        const g2 = norm(Rx - 30, midY - 75);
+        const g3 = norm(Rx - 70, midY + 15);
+        const g4 = norm(Rx - 10, midY + 70);
+        const g5 = norm(Rx + 40, midY + 50);
         drawThroughPoints([g1, g2, g3, g4, g5], '①');
-        // small tail
-        straight(g5.px, g5.py, norm(Rx + 70, midY + 70).px, norm(Rx + 70, midY + 70).py, '②');
+        // small tail — make it a standalone guide with its own anchors (independent from G1)
+        try {
+          const tailStart = norm(Rx + 60, midY - 60);
+          const tailCp = norm(Rx + 95, midY + 195);
+          const tailEnd = norm(Rx - 60, midY + 125);
+          curve(tailStart.px, tailStart.py, tailCp.px, tailCp.py, tailEnd.px, tailEnd.py, 10, '②');
+        } catch (e) {
+          const tailStart = norm(Rx + 60, midY + 20);
+          const tailEnd = norm(Rx + 100, midY + 100);
+          straight(tailStart.px, tailStart.py, tailEnd.px, tailEnd.py, '②');
+        }
         break;
       case 'h':
         // small h: stem + right arch
-        const h1 = norm(Rx - 60, topY - 10);
-        const h2 = norm(Rx - 60, botY + 10);
+        const h1 = norm(Rx - 60, topY + 10);
+        const h2 = norm(Rx - 60, botY - 65);
         straight(h1.px, h1.py, h2.px, h2.py, '①');
-        const h_a1 = norm(Rx - 10, midY - 10);
-        const h_a2 = norm(Rx + 40, midY + 40);
-        drawThroughPoints([h_a1, norm(Rx + 10, midY - 10), h_a2], '②');
+        const h_p1 = norm(Rx - 42, midY - 55);
+        const h_p2 = norm(Rx + 20, midY - 78);
+        const h_p3 = norm(Rx + 58, midY - 30);
+        const h_p4 = norm(Rx + 60, midY + 72);
+        drawThroughPoints([h_p1, h_p2, h_p3, h_p4], '②');
         break;
       case 'i':
         // small i: short vertical + dot
-        const i1 = norm(Rx + 10, topY - 20);
-        const i2 = norm(Rx + 10, midY + 40);
+        const i1 = norm(Rx, topY + 85);
+        const i2 = norm(Rx, midY + 70);
         straight(i1.px, i1.py, i2.px, i2.py, '①');
-        try { const dot = cartToPx(...Object.values(pxToCart(Rx + 10, topY - 36))); tctx.fillText('●', dot.px, dot.py); } catch(e){}
+        try { const dot = cartToPx(...Object.values(pxToCart(Rx, topY + 17))); tctx.fillText('●', dot.px, dot.py); } catch(e){}
         break;
       case 'j':
-        // small j: downward tail
-        const j1 = norm(Rx + 30, topY - 10);
-        const j2 = norm(Rx + 30, botY + 40);
-        drawThroughPoints([j1, norm(Rx + 30, midY), j2], '①');
+        // small j: downward tail with a dot above (like 'i')
+        const j1 = norm(Rx, topY + 90);
+        const j_mid = norm(Rx, midY + 105);
+        const j2 = norm(Rx - 47, botY + 3 );
+        drawThroughPoints([j1, j_mid, j2], '①');
+        // add a dot above the stroke similar to small 'i'
+        try {
+          const j_dot = cartToPx(...Object.values(pxToCart(Rx, topY + 17)));
+          tctx.fillText('●', j_dot.px, j_dot.py);
+        } catch (e) { /* ignore drawing errors */ }
         break;
       case 'k':
-        // small k: stem + two diagonals
-        const k_stem1 = norm(Rx - 60, topY - 10);
-        const k_stem2 = norm(Rx - 60, botY + 10);
-        straight(k_stem1.px, k_stem1.py, k_stem2.px, k_stem2.py, '①');
-        straight(norm(Rx - 20, midY - 10).px, norm(Rx - 20, midY - 10).py, norm(Rx + 30, topY + 10).px, norm(Rx + 30, topY + 10).py, '②');
-        straight(norm(Rx - 20, midY + 10).px, norm(Rx - 20, midY + 10).py, norm(Rx + 30, botY - 10).px, norm(Rx + 30, botY - 10).py, '③');
+        // match uppercase K layout scaled to lowercase area
+        const k1p = norm(Rx - 48, topY + 10);
+        const k2p = norm(Rx - 48, botY - 65);
+        straight(k1p.px, k1p.py, k2p.px, k2p.py, '①');
+        const k3p = norm(Rx - 20, midY - 5);
+        const k4p = norm(Rx + 60, topY + 80);
+        straight(k3p.px, k3p.py, k4p.px, k4p.py, '②');
+        const k5p = norm(Rx - 37, midY - 18);
+        const k6p = norm(Rx + 60, botY - 65);
+        straight(k5p.px, k5p.py, k6p.px, k6p.py, '③');
         break;
       case 'l':
         // small l: simple vertical
-        straight(norm(Rx, topY - 20).px, norm(Rx, topY - 20).py, norm(Rx, botY + 20).px, norm(Rx, botY + 20).py, '①');
+        straight(norm(Rx - 10, topY + 20).px, norm(Rx - 10, topY + 20).py, norm(Rx - 10, botY - 60).px, norm(Rx - 10, botY - 80).py, '①');
         break;
       case 'm':
-        // small m: series of humps
-        const m1 = norm(Rx - 60, midY + 40);
-        const m2 = norm(Rx - 20, midY - 10);
-        const m3 = norm(Rx + 20, midY + 40);
-        const m4 = norm(Rx + 60, midY - 10);
-        const m5 = norm(Rx + 100, midY + 40);
-        drawThroughPoints([m1, m2, m3, m4, m5], '①');
+        // small m: three guides — ① straight baseline, ② and ③ are 4-point editable splines
+        // ① baseline (straight)
+        const m_line_start = norm(Rx - 108, botY - 65);
+        const m_line_end = norm(Rx - 108, topY + 80);
+        straight(m_line_start.px, m_line_start.py, m_line_end.px, m_line_end.py, '①');
+
+        // ② first hump (4 anchors)
+        const m_a1 = norm(Rx - 100, midY - 45);
+        const m_a2 = norm(Rx - 65, midY - 75);
+        const m_a3 = norm(Rx - 5, midY - 55);
+        const m_a4 = norm(Rx + 0, midY + 75);
+        drawThroughPoints([m_a1, m_a2, m_a3, m_a4], '②');
+
+        // ③ second hump (4 anchors)
+        const m_b1 = norm(Rx + 10, midY - 40);
+        const m_b2 = norm(Rx + 45, midY - 75);
+        const m_b3 = norm(Rx + 105, midY - 55);
+        const m_b4 = norm(Rx + 110, midY + 75);
+        drawThroughPoints([m_b1, m_b2, m_b3, m_b4], '③');
         break;
       case 'n':
         // small n: up then down
-        const n1 = norm(Rx - 60, midY + 40);
-        const n2 = norm(Rx - 20, midY - 10);
-        const n3 = norm(Rx + 20, midY + 40);
-        drawThroughPoints([n1, n2, n3], '①');
+         const n_line_start = norm(Rx - 60, botY - 65);
+        const n_line_end = norm(Rx - 60, topY + 80);
+        straight(n_line_start.px, n_line_start.py, n_line_end.px, n_line_end.py, '①');
+
+        // ② first hump (4 anchors)
+        const n_a1 = norm(Rx - 52, midY - 35);
+        const n_a2 = norm(Rx - 12, midY - 74);
+        const n_a3 = norm(Rx + 54, midY - 55);
+        const n_a4 = norm(Rx + 59, midY + 75);
+        drawThroughPoints([n_a1, n_a2, n_a3, n_a4], '②');
         break;
       case 'o':
-        // small o: circular loop
-        const o1 = norm(Rx, midY - 40);
-        const o2 = norm(Rx - 40, midY);
-        const o3 = norm(Rx, midY + 40);
-        const o4 = norm(Rx + 40, midY);
-        drawThroughPoints([o1, o2, o3, o4, o1], '①');
+        // small o: circular guide with an arrow (fallback to spline if semicircle fails)
+        try {
+          semicircle(Rx, midY, 75, -Math.PI/2, -Math.PI/2 + Math.PI * 1.9, '①');
+        } catch (e) {
+          const o1 = norm(Rx, midY - 40);
+          const o2 = norm(Rx - 40, midY);
+          const o3 = norm(Rx, midY + 40);
+          const o4 = norm(Rx + 40, midY);
+          drawThroughPoints([o1, o2, o3, o4, o1], '①');
+        }
         break;
       case 'p':
         // small p: stem + loop above baseline
