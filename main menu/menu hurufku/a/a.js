@@ -252,115 +252,15 @@ function renderGuideTemplate(withArrows = false) {
       tctx.fillText('③', Lx, barY - 30);
     }
 
-    // Lowercase a: entrance stroke (top-left → down-right), then right-side half-circle (top → bottom)
     if (currentLetter.toLowerCase() === 'a') {
-      // Tweak ukuran ini agar pas dengan ukuran font Anda
-      const r = 46;            // Jari-jari lingkaran perut 'a' (adjusted per request)
-      const xOffset = 20;      // Geser sedikit ke kiri dari titik tengah Rx
-      const yOffset = 20;      // Geser sedikit ke bawah agar pas di tengah x-height
-
-      // Tambahan offset global untuk merapikan semua garis huruf kecil 'a'
-      const smallShiftX = 12;  // geser ke kanan
-      const smallShiftY = 10;   // geser ke bawah
-
-      const ax = Rx - xOffset + smallShiftX;
-      const ay = Cy + yOffset + smallShiftY;
-
-      // Langkah 1: Perut 'a' (Lingkaran/Arc)
-      // Tambahan: Garis panduan masuk (tanpa nomor) dari atas-kiri menuju titik awal arc
-      // Hitung titik awal arc
-      // shift the arc center slightly down so the top of the arc sits lower
-      const arcCenterYOffset = 12; // pixels to lower the arc's top
-      const arcAy = ay + arcCenterYOffset;
-      const startAngle = -0.3 * Math.PI;
-      // pull the lower end of the arc slightly up by using a small negative end angle
-      const endAngle = -1.1 * Math.PI;
-      const startArcX = ax + r * Math.cos(startAngle);
-      const startArcY = arcAy + r * Math.sin(startAngle);
-
-      // Garis panduan pendek untuk orientasi stem
-      const stemX_pre = ax + r - 5; // posisi tiang (digunakan untuk orientasi panduan)
-      const stemTopY_pre = ay - r;
-
-      // Draw a smooth loop through five anchor points (similar to d's ②)
-      function drawThroughPoints(pixelPts, label) {
-        if (!pixelPts || pixelPts.length < 2) return;
-        tctx.beginPath();
-        tctx.moveTo(pixelPts[0].px, pixelPts[0].py);
-        for (let i = 0; i < pixelPts.length - 1; i++) {
-          const p0 = pixelPts[i - 1] || pixelPts[i];
-          const p1 = pixelPts[i];
-          const p2 = pixelPts[i + 1];
-          const p3 = pixelPts[i + 2] || p2;
-          const cp1x = p1.px + (p2.px - p0.px) / 6;
-          const cp1y = p1.py + (p2.py - p0.py) / 6;
-          const cp2x = p2.px - (p3.px - p1.px) / 6;
-          const cp2y = p2.py - (p3.py - p1.py) / 6;
-          tctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.px, p2.py);
-        }
-        tctx.stroke();
-        // arrow at end
-        const last = pixelPts[pixelPts.length - 1];
-        const prev = pixelPts[pixelPts.length - 2] || pixelPts[0];
-        drawArrowHead(tctx, prev.px, prev.py, last.px, last.py, 12);
-        if (label) {
-          const mid = pixelPts[Math.floor(pixelPts.length / 2)];
-          tctx.fillText(label, mid.px, mid.py - 18);
-        }
-      }
-
-      // construct five anchor points for the loop around (ax, arcAy)
+      // small a: simplified 4-point spline guide (consistent with other letters)
       const a_pts = [
-        { px: ax + Math.round(r * 0.6), py: arcAy - Math.round(r * 1) },
-        { px: ax - Math.round(r * 0.1), py: arcAy - Math.round(r * 1) },
-        { px: ax - Math.round(r * 1.1), py: arcAy + Math.round(r * - 0.2) },
-        { px: ax - Math.round(r * 0.2), py: arcAy + Math.round(r * 0.8) },
-        { px: ax + Math.round(r * 0.7), py: arcAy + Math.round(r * 0.6) }
+        norm(Rx + 50, midY - 30),
+        norm(Rx - 20, midY - 35),
+        norm(Rx - 35, midY + 50),
+        norm(Rx + 30, midY + 40)
       ];
-
-      drawThroughPoints(a_pts, '②');
-
-      // Small curved guide above the lowercase 'a' with an arrowhead at the right end
-      // This creates a short curve that bends slightly upward, ending with an arrow to show direction
-      try {
-        tctx.beginPath();
-        const topStartX = ax - r + 1;
-        // pull the small top curve up a bit (12px) without changing other layout
-        const topStartY = ay - r - 50;
-        const topEndX = stemX_pre + 15; // uses previously computed stemX_pre
-        const topEndY = ay - r - 48;
-        const cpX = (topStartX + topEndX) / 2;
-        const cpY = topStartY - 28; // control point above to make curve bend upward
-        tctx.lineWidth = 2;
-        tctx.strokeStyle = '#FF6B35';
-        tctx.moveTo(topStartX, topStartY);
-        tctx.quadraticCurveTo(cpX, cpY, topEndX, topEndY);
-        tctx.stroke();
-        // arrowhead at curve end
-        drawArrowHead(tctx, cpX, cpY, topEndX, topEndY, 10);
-        // restore stroke style/width for subsequent drawing
-        tctx.lineWidth = 2;
-        tctx.strokeStyle = '#FF6B35';
-      } catch (e) { /* best-effort guide, ignore if any issue */ }
-
-      // Panah untuk langkah 2 (di ujung bawah kurva) — label nomornya ditukar
-      // Kita hitung titik ujung kurva untuk menaruh panah
-      // label ② placed near the loop area (drawThroughPoints already labeled at midpoint)
-
-      // Langkah 2: Tiang 'a' (Garis lurus atas ke bawah)
-      // Posisi x tiang ada di sisi kanan lingkaran
-      const stemX = ax + r + 15; // -5 agar garis nempel dengan lingkaran
-      const stemTopY = ay - r;
-      const stemBotY = ay + r;
-
-      tctx.beginPath();
-      tctx.moveTo(stemX, stemTopY);
-      tctx.lineTo(stemX, stemBotY);
-      tctx.stroke();
-
-      // Panah untuk langkah 1 (di bawah tiang)
-      drawArrowHead(tctx, stemX, stemTopY, stemX, stemBotY, 12);
-      tctx.fillText('①', stemX + 30, ay); // Sekarang langkah 1
+      drawThroughPoints(a_pts, '①');
     }
     tctx.restore();
   }

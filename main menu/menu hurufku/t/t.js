@@ -193,23 +193,7 @@ function renderGuideTemplate(withArrows = false) {
 
     const Lx = LEFT_CENTER_X, Rx = RIGHT_CENTER_X, Cy = GUIDE_CENTER_Y;
 
-    // T: stroke order - horizontal, vertical (2 strokes)
-    if (currentLetter.toUpperCase() === 'T') {
-      // Number 1 on top horizontal
-      tctx.fillText('①', Lx, Cy - 140);
-      
-      // Number 2 on vertical stem
-      tctx.fillText('②', Lx, Cy + 20);
-    }
-
-    // t: stroke order - vertical then horizontal (2 strokes)
-    if (currentLetter.toLowerCase() === 't') {
-      // Number 1 on vertical
-      tctx.fillText('①', Rx - 10, Cy);
-      
-      // Number 2 on horizontal
-      tctx.fillText('②', Rx + 20, Cy - 40);
-    }
+    // stroke-order overlays for specific letters are handled by per-letter guides
 
     tctx.restore();
       if (typeof drawLetterGuides === 'function') {
