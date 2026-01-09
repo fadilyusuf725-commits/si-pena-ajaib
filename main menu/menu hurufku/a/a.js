@@ -253,14 +253,8 @@ function renderGuideTemplate(withArrows = false) {
     }
 
     if (currentLetter.toLowerCase() === 'a') {
-      // small a: simplified 4-point spline guide (consistent with other letters)
-      const a_pts = [
-        norm(Rx + 50, midY - 30),
-        norm(Rx - 20, midY - 35),
-        norm(Rx - 35, midY + 50),
-        norm(Rx + 30, midY + 40)
-      ];
-      drawThroughPoints(a_pts, '①');
+      // delegate to central guides renderer to keep behavior consistent
+      try { drawLetterGuides(tctx, currentLetter, LEFT_CENTER_X, RIGHT_CENTER_X, GUIDE_CENTER_Y); } catch (e) { /* ignore */ }
     }
     tctx.restore();
   }

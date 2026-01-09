@@ -433,12 +433,21 @@
     // Also handle lowercase-specific quick hints for some letters
     switch(L){
       case 'a':
+         const a_stem_pts = [
+          norm(Rx - 50, topY + 95),
+          norm(Rx - 0, topY + 80),
+          norm(Rx + 45, topY + 100),
+          norm(Rx + 55, botY - 120),
+          norm(Rx + 53, botY - 65)
+        ];
+        drawThroughPoints(a_stem_pts, '①');
         // small a: single 4-point curve guide
         const a_pts = [
-          norm(Rx + 50, midY - 30),
-          norm(Rx - 20, midY - 35),
-          norm(Rx - 35, midY + 50),
-          norm(Rx + 30, midY + 40)
+          norm(Rx + 25, midY - 5),
+          norm(Rx - 40, midY + 2),
+          norm(Rx - 57, midY + 50),
+          norm(Rx - 25, midY + 77),
+          norm(Rx + 28, midY + 65)
         ];
         drawThroughPoints(a_pts, '②');
         break;
