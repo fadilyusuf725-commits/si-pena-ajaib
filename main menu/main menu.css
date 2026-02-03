@@ -373,3 +373,22 @@ footer {
     font-size: 18px;
   }
 }
+
+/* Make right-side icon buttons match left-side nav button styling across pages */
+.icon-btn {
+  background: #fff;
+  border: 2px solid #164E86;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:disabled,
+.icon-btn.disabled {
+  opacity: 0.28;
+  pointer-events: none;
+}

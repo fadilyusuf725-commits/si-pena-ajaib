@@ -15,6 +15,7 @@ body{margin:0;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--p
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px}
 .nav-left{display:flex;align-items:center;gap:10px}
 .nav-btn{background:#fff;border:2px solid var(--primary);border-radius:10px;padding:6px 10px;cursor:pointer}
+.icon-btn{background:#fff;border:2px solid var(--primary);border-radius:10px;padding:6px 10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 .nav-btn.disabled{opacity:0.28;pointer-events:none}
 .label{font-weight:800;font-size:18px}
 
@@ -83,8 +84,15 @@ footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#D6F1FF;bor
   }
 
   .icon-btn {
-    padding: 5px 8px;
-    font-size: 16px;
+    background: #fff;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .container {
@@ -172,8 +180,15 @@ footer{position:fixed;left:0;right:0;bottom:0;height:72px;background:#D6F1FF;bor
   }
 
   .icon-btn {
+    background: #fff;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
     padding: 4px 6px;
+    cursor: pointer;
     font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .container {
