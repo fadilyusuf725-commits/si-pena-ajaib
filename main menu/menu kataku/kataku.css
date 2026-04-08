@@ -158,21 +158,44 @@ header {
 
 /* canvas */
 .canvas-wrap {
+  --canvas-pad: 14px;
   width: 100%;
   max-width: 760px;
   background: #fff;
   border-radius: 18px;
-  padding: 14px;
+  padding: var(--canvas-pad);
   border: 3px solid #9fc5ff;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
 }
 
+#templateCanvas,
 #drawCanvas {
   width: 100%;
   height: 160px;
   display: block;
   border-radius: 10px;
+}
+
+#templateCanvas {
+  position: relative;
+  z-index: 1;
+}
+
+#drawCanvas {
+  position: absolute;
+  inset: var(--canvas-pad);
+  z-index: 2;
   touch-action: none;
+}
+
+.status-text {
+  max-width: 760px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--accent);
+  min-height: 24px;
 }
 
 /* controls */
@@ -283,10 +306,15 @@ footer {
   }
 
   .canvas-wrap {
+    --canvas-pad: 10px;
     max-width: 100%;
-    padding: 10px;
   }
 
+  #drawCanvas {
+    height: 140px;
+  }
+
+  #templateCanvas,
   #drawCanvas {
     height: 140px;
   }
@@ -378,11 +406,16 @@ footer {
   }
 
   .canvas-wrap {
+    --canvas-pad: 8px;
     max-width: 100%;
-    padding: 8px;
     border-radius: 14px;
   }
 
+  #drawCanvas {
+    height: 120px;
+  }
+
+  #templateCanvas,
   #drawCanvas {
     height: 120px;
   }
@@ -494,10 +527,15 @@ footer {
   }
 
   .canvas-wrap {
-    padding: 6px;
+    --canvas-pad: 6px;
     border-radius: 12px;
   }
 
+  #drawCanvas {
+    height: 100px;
+  }
+
+  #templateCanvas,
   #drawCanvas {
     height: 100px;
   }

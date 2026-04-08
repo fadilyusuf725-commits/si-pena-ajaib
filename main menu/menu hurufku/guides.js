@@ -762,24 +762,9 @@
         const url = window.BG_MUSIC || 'https://cdn.pixabay.com/download/audio/2025/03/30/audio_3d2ec07913.mp3?filename=spring-in-my-step-copyright-free-music-for-youtube-320726.mp3';
         window.bgm = document.getElementById('bgm') || new Audio(url);
       }
-      // Diagnostic: expose when bgm was initialized and basic state
-      try { window.__bgm_diagnostics = window.__bgm_diagnostics || {}; } catch(e){}
-      try { window.__bgm_diagnostics.createdOn = window.__bgm_diagnostics.createdOn || Date.now(); } catch(e){}
       const bgm = window.bgm;
       bgm.loop = true;
       bgm.preload = 'auto';
-
-      // Diagnostic logging: basic info for debugging autoplay across pages
-      try {
-        console.info('[guides.js] bgm:', {
-          exists: !!window.bgm,
-          src: bgm && (bgm.src || bgm.currentSrc || '(no-src)'),
-          paused: !!(bgm && bgm.paused),
-          readyState: bgm && bgm.readyState
-        });
-        window.__bgm_diagnostics.src = bgm && (bgm.src || bgm.currentSrc || '(no-src)');
-        window.__bgm_diagnostics.paused = !!(bgm && bgm.paused);
-      } catch(e){}
 
       // restore time and play state
       const savedTime = parseFloat(safeGet('bgmTime','0')) || 0;
@@ -791,20 +776,13 @@
       const wasPlaying = safeGet('bgmPlaying','0') === '1';
       if (wasPlaying) {
         // Attempt to autoplay; if blocked we'll register a one-time gesture to resume.
-        bgm.play().then(() => {
-          try { console.info('[guides.js] bgm.play() succeeded on load'); } catch(e){}
-          try { window.__bgm_diagnostics.autoplaySucceeded = true; window.__bgm_diagnostics.paused = false; } catch(e){}
-        }).catch((err) => {
-          try { console.warn('[guides.js] bgm.play() blocked on load', err); } catch(e){}
-          try { window.__bgm_diagnostics.autoplayBlocked = true; } catch(e){}
+        bgm.play().catch(() => {
           // Autoplay blocked — resume on first user gesture
           try {
             if (musicBtn) musicBtn.textContent = '▶';
           } catch(e){}
           const resume = () => {
             bgm.play().then(() => {
-              try { console.info('[guides.js] bgm.play() resumed via user gesture'); } catch(e){}
-              try { window.__bgm_diagnostics.resumedByGesture = Date.now(); window.__bgm_diagnostics.paused = false; } catch(e){}
               try { if (musicBtn) musicBtn.textContent = '🔊'; } catch(e){}
             }).catch(()=>{});
           };
@@ -817,9 +795,8 @@
       // sync visual button if present
       if (musicBtn) musicBtn.textContent = bgm.paused ? '🎵' : '🔊';
 
-      // expose global quick flags for letter scripts to read (diagnostic)
-      try { window.__bgm_diagnostics.paused = !!bgm.paused; window.__bgm_playing = !bgm.paused; window.audioOn = !!(!bgm.paused); } catch(e){}
-      try { console.info('[guides.js] global audioOn=', window.audioOn); } catch(e){}
+      // expose global quick flags for letter scripts to read
+      try { window.__bgm_playing = !bgm.paused; window.audioOn = !!(!bgm.paused); } catch(e){}
 
       // update saved time every second
       setInterval(() => {

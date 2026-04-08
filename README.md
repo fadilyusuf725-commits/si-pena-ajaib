@@ -1,70 +1,62 @@
-# Si Pena Ajaib ✏️
+# Si Pena Ajaib
 
-Aplikasi web interaktif untuk belajar menulis huruf, kata, dan cerita dengan cara yang menyenangkan!
+Si Pena Ajaib adalah situs statis untuk belajar menulis huruf, kata, dan cerita secara interaktif. Proyek ini ditujukan untuk dijalankan langsung di browser dan dipublikasikan lewat GitHub Pages.
 
-## 🎯 Fitur Utama
+## Fitur
 
-- **Hurufku** - Belajar menulis huruf A-Z dengan panduan interaktif
-- **Kataku** - Belajar menulis kata dengan gambar dan suara
-- **Ceritaku** - Menyusun cerita dengan drag-and-drop kata
+- `Hurufku`: tracing huruf besar dan kecil A-Z dengan panduan garis bantu
+- `Kataku`: latihan menulis kata dengan validasi tracing yang lebih ketat
+- `Ceritaku`: menyusun kalimat dari gambar dengan drag-and-drop
+- `Gamifikasi v1`: bintang dan badge tersimpan di browser
+- `Resume belajar`: tombol `Mulai Belajar` melanjutkan ke halaman terakhir
 
-## 🚀 Cara Membuka
+## Struktur Aktif
 
-1. Buka file `index.html` di browser Anda
-2. Atau kunjungi: https://fadilyusuf725-commits.github.io/si-pena-ajaib/
-
-## 📱 Responsive Design
-
-- ✅ Desktop (1024px+)
-- ✅ Tablet (768px - 1024px)
-- ✅ Mobile (480px - 768px)
-- ✅ Mobile Kecil (<480px)
-
-## 🎨 Struktur Folder
-
-```
-si-pena-ajaib/
-├── index.html                 # Halaman landing
-├── main menu/
-│   ├── main menu.html        # Menu utama
-│   ├── main menu.css
-│   ├── main menu.js
-│   ├── menu hurufku/         # Menu huruf A-Z
-│   │   └── a/, b/, c/, ...   # Setiap huruf punya folder sendiri
-│   ├── menu kataku/          # Menu kata
-│   └── menu ceritaku/        # Menu cerita
-└── public/                   # Aset publik
+```text
+.
+├── index.html
+├── favicon.svg
+├── _config.yml
+└── main menu/
+    ├── main menu.html
+    ├── main menu.css
+    ├── main menu.js
+    ├── rewards.js
+    ├── pena.png
+    ├── menu hurufku/
+    ├── menu kataku/
+    └── menu ceritaku/
 ```
 
-## 💻 Teknologi yang Digunakan
+## Menjalankan Lokal
 
-- HTML5
-- CSS3 (dengan Media Queries)
-- JavaScript (Vanilla)
-- Canvas API (untuk gambar)
-- LocalStorage (untuk menyimpan progress)
+Karena ini situs statis, cukup layani folder proyek dengan server file statis.
 
-## 📝 Fitur Teknis
+Contoh dengan Python:
 
-- ✅ Responsive mobile-first design
-- ✅ Drawing canvas dengan touch support
-- ✅ Audio background music
-- ✅ Animasi interaktif
-- ✅ Progress tracking menggunakan localStorage
-- ✅ Navigation yang smooth
+```bash
+python -m http.server 4173
+```
 
-## 🔊 Audio
+Lalu buka `http://127.0.0.1:4173/`.
 
-Web ini menggunakan audio background dari Pixabay (royalty-free).
+## Deploy
 
-## 📄 Lisensi
+Konfigurasi GitHub Pages ada di `_config.yml`.
 
-Proyek ini dibuat untuk tujuan edukasi.
+URL produksi:
 
-## 👨‍💻 Pengembang
+`https://fadilyusuf725-commits.github.io/si-pena-ajaib/`
 
-Dibuat dengan ❤️ untuk pembelajaran interaktif anak-anak.
+## Penyimpanan Browser
 
----
+Progress dan reward disimpan di `localStorage` dengan key berikut:
 
-**Selamat belajar menulis! ✏️📚**
+- `progressLetters`
+- `cerita_progress`
+- `lastVisitedFull`
+- `bgmPlaying`
+- `bgmTime`
+- `rewardStars`
+- `badgesUnlocked`
+- `rewardClaims`

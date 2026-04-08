@@ -1,8 +1,10 @@
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Kataku</title>
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="kataku.css">
 </head>
 <body>
@@ -31,8 +33,11 @@
     </div>
 
     <div class="canvas-wrap">
+      <canvas id="templateCanvas" width="760" height="160" aria-label="Template kata"></canvas>
       <canvas id="drawCanvas" width="760" height="160"></canvas>
     </div>
+
+    <div id="statusText" class="status-text">Ikuti bentuk kata, lalu tekan tombol kata berikutnya saat selesai.</div>
 
     <div class="controls">
       <button id="hintBtn" class="action-btn">📝 Petunjuk</button>
@@ -53,6 +58,7 @@
 </audio>
 
 <script src="../menu hurufku/guides.js"></script>
+<script src="../rewards.js"></script>
 <script src="kataku.js"></script>
 </body>
 </html>

@@ -41,6 +41,7 @@ const clearBtn = document.getElementById('clearBtn');
 const toggleGuideBtn = document.getElementById('toggleGuide') || document.getElementById('toggleGuideBtn');
 const nextBtn = document.getElementById('nextBtn');
 const homeBtn = document.getElementById('homeBtn');
+const backBtn = document.getElementById('backBtn');
 const musicBtn = document.getElementById('musicBtn') || document.getElementById('audioBtn');
 const starBtn = document.getElementById('starBtn');
 const traceFeedback = document.getElementById('traceFeedback');
@@ -412,6 +413,9 @@ function evaluateCoverage() {
 
     progressLetters[currentLetter] = true;
     localStorage.setItem('progressLetters', JSON.stringify(progressLetters));
+    if (window.rewardSystem && typeof window.rewardSystem.grantLetterReward === 'function') {
+      window.rewardSystem.grantLetterReward(currentLetter);
+    }
 
     if (traceFeedback)
       traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa 🎉';

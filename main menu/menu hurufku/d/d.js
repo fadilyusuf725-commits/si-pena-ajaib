@@ -342,6 +342,9 @@ function evaluateCoverage() {
 
     progressLetters[currentLetter] = true;
     localStorage.setItem('progressLetters', JSON.stringify(progressLetters));
+    if (window.rewardSystem && typeof window.rewardSystem.grantLetterReward === 'function') {
+      window.rewardSystem.grantLetterReward(currentLetter);
+    }
 
     if (traceFeedback)
       traceFeedback.innerHTML = 'Yeay! Kamu menyelesaikan kedua sketsa ';

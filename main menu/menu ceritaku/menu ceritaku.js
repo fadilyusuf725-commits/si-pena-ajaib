@@ -1,416 +1,426 @@
-/* ceritaku-final.js — final polished
-   - single hint button (levels 1..3 sticky at 3)
-   - hint levels restore hinted words if user moves them
-   - wrong sound (aww) reliably played
-   - yeay sound plays once per scene, not cut
-   - footer/music/home unified
-*/
+const bgm = document.getElementById("bgm");
+const homeBtn = document.getElementById("homeBtn");
+const homeFooter = document.getElementById("homeFooter");
+const musicBtn = document.getElementById("musicBtn");
+const storySelect = document.getElementById("storySelect");
+const startBtn = document.getElementById("startBtn");
+const sceneArea = document.getElementById("sceneArea");
+const sceneImg = document.getElementById("sceneImg");
+const sceneIndexBadge = document.getElementById("sceneIndexBadge");
+const wordBankEl = document.getElementById("wordBank");
+const dropArea = document.getElementById("dropArea");
+const hintBtn = document.getElementById("hintBtn");
+const clearBtn = document.getElementById("clearBtn");
+const nextBtn = document.getElementById("nextBtn");
+const feedback = document.getElementById("feedback");
+const starBtn = document.getElementById("starBtn");
 
-/* ---------- DOM ---------- */
-const bgm = document.getElementById('bgm');
-const homeBtn = document.getElementById('homeBtn');
-const homeFooter = document.getElementById('homeFooter');
-const musicFooter = document.getElementById('musicFooter');
-const storySelect = document.getElementById('storySelect');
-const startBtn = document.getElementById('startBtn');
-const sceneArea = document.getElementById('sceneArea');
-const sceneImg = document.getElementById('sceneImg');
-const sceneIndexBadge = document.getElementById('sceneIndexBadge');
-const wordBankEl = document.getElementById('wordBank');
-const dropArea = document.getElementById('dropArea');
-const hintBtn = document.getElementById('hintBtn');
-const clearBtn = document.getElementById('clearBtn');
-const nextBtn = document.getElementById('nextBtn');
-const feedback = document.getElementById('feedback');
-const starBtn = document.getElementById('starBtn');
+try {
+  localStorage.setItem("lastVisitedFull", "menu ceritaku/menu ceritaku.html");
+} catch (error) {
+  /* noop */
+}
 
-// mark this menu as last visited (used by Main menu resume)
-try { localStorage.setItem('lastVisitedFull', 'menu ceritaku/menu ceritaku.html'); } catch(e){}
-
-/* ---------- audio (separate objects to avoid collision) ---------- */
 const CHEER_SRC = "https://www.myinstants.com/media/sounds/kids_cheering.mp3";
-const AWW_SRC   = "https://www.myinstants.com/media/sounds/studio-audience-awwww-sound-fx.mp3";
+const AWW_SRC = "https://www.myinstants.com/media/sounds/studio-audience-awwww-sound-fx.mp3";
 
-const yeayAudio = new Audio(CHEER_SRC); yeayAudio.preload = 'auto'; yeayAudio.volume = 1;
-const wrongAudio = new Audio(AWW_SRC); wrongAudio.preload = 'auto'; wrongAudio.volume = 1;
+const yeayAudio = new Audio(CHEER_SRC);
+yeayAudio.preload = "auto";
+yeayAudio.volume = 1;
 
-/* helper audio functions (pause others before play) */
-function playYeayOnce(sceneKey) {
-  if (playedYeay[sceneKey]) return;
-  try {
-    wrongAudio.pause(); wrongAudio.currentTime = 0;
-    yeayAudio.pause(); yeayAudio.currentTime = 0;
-    yeayAudio.play().catch(()=>{});
-    playedYeay[sceneKey] = true;
-  } catch(e){ console.warn(e); }
-}
-function playWrong() {
-  try {
-    yeayAudio.pause(); yeayAudio.currentTime = 0;
-    wrongAudio.pause(); wrongAudio.currentTime = 0;
-    wrongAudio.play().catch(()=>{});
-  } catch(e){ console.warn(e); }
-}
+const wrongAudio = new Audio(AWW_SRC);
+wrongAudio.preload = "auto";
+wrongAudio.volume = 1;
 
-/* ---------- stories (2 sample stories) ---------- */
 const stories = {
   andi: {
-    id: 'andi',
-    title: 'Andi Pergi ke Sekolah',
+    id: "andi",
+    title: "Andi Pergi ke Sekolah",
     scenes: [
-      { img: 'Andi 1.jpeg', sentence: 'Andi bangun pagi dan meregangkan tubuhnya.' },
-      { img: 'Andi 2.jpeg', sentence: 'Andi mandi dengan sabun dan bermain busa.' },
-      { img: 'Andi 3.jpeg', sentence: 'Andi sarapan sehat agar kuat di sekolah.' },
-      { img: 'Andi 4.jpeg', sentence: 'Andi berjalan menuju sekolah sambil tersenyum.' }
-    ]
+      { img: "Andi 1.jpeg", sentence: "Andi bangun pagi dan meregangkan tubuhnya." },
+      { img: "Andi 2.jpeg", sentence: "Andi mandi dengan sabun dan bermain busa." },
+      { img: "Andi 3.jpeg", sentence: "Andi sarapan sehat agar kuat di sekolah." },
+      { img: "Andi 4.jpeg", sentence: "Andi berjalan menuju sekolah sambil tersenyum." },
+    ],
   },
   kancil: {
-    id: 'kancil',
-    title: 'Si Kancil dan Buaya',
+    id: "kancil",
+    title: "Si Kancil dan Buaya",
     scenes: [
-      { img: 'Kancil 1.jpeg', sentence: 'Kancil melihat buaya di tepi sungai.' },
-      { img: 'Kancil 2.jpeg', sentence: 'Buaya membuka mulutnya mendekati Kancil.' },
-      { img: 'Kancil 3.jpeg', sentence: 'Kancil melompat di atas punggung buaya dan menyeberang.' },
-      { img: 'Kancil 4.jpeg', sentence: 'Kancil sampai di seberang dan memetik apel.' }
-    ]
-  }
+      { img: "Kancil 1.jpeg", sentence: "Kancil melihat buaya di tepi sungai." },
+      { img: "Kancil 2.jpeg", sentence: "Buaya membuka mulutnya mendekati Kancil." },
+      { img: "Kancil 3.jpeg", sentence: "Kancil melompat di atas punggung buaya dan menyeberang." },
+      { img: "Kancil 4.jpeg", sentence: "Kancil sampai di seberang dan memetik apel." },
+    ],
+  },
 };
 
-/* ---------- state ---------- */
 let currentStory = null;
 let currentSceneIndex = 0;
-let shuffledWords = [];
-let hintLevel = 0; // 0 none, 1 fill1, 2 fill2, 3 dubbing (sticky)
-const hintedSlots = new Set(); // indices that were auto-filled by hint
-const playedYeay = {}; // guard yeay per scene (key: story_scene)
-const progressKey = 'cerita_progress';
-let progress = JSON.parse(localStorage.getItem(progressKey) || '{}');
+let hintLevel = 0;
+let sceneSolved = false;
+let touchStartElement = null;
+let draggedWord = null;
+const hintedSlots = new Set();
+const playedYeay = {};
+const progressKey = "cerita_progress";
+let progress = JSON.parse(localStorage.getItem(progressKey) || "{}");
 
-/* ---------- init ---------- */
-function initStoryOptions(){
-  Object.values(stories).forEach(st=>{
-    const opt = document.createElement('option');
-    opt.value = st.id;
-    opt.textContent = st.title;
-    storySelect.appendChild(opt);
+function sceneKey() {
+  return `${currentStory.id}_${currentSceneIndex}`;
+}
+
+function playYeayOnce(key) {
+  if (playedYeay[key]) return;
+  wrongAudio.pause();
+  wrongAudio.currentTime = 0;
+  yeayAudio.pause();
+  yeayAudio.currentTime = 0;
+  yeayAudio.play().catch(() => {});
+  playedYeay[key] = true;
+}
+
+function playWrong() {
+  yeayAudio.pause();
+  yeayAudio.currentTime = 0;
+  wrongAudio.pause();
+  wrongAudio.currentTime = 0;
+  wrongAudio.play().catch(() => {});
+}
+
+function spawnStars(count = 10) {
+  for (let i = 0; i < count; i += 1) {
+    const star = document.createElement("div");
+    star.className = "bintang";
+    star.textContent = "⭐";
+    star.style.left = `${Math.random() * 88 + 4}vw`;
+    star.style.fontSize = `${16 + Math.random() * 30}px`;
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 2600);
+  }
+}
+
+function getSceneWords() {
+  return currentStory.scenes[currentSceneIndex].sentence.split(/\s+/).filter(Boolean);
+}
+
+function syncMusicIcon() {
+  if (!musicBtn) return;
+  musicBtn.textContent = bgm.paused ? "🎵" : "🔊";
+}
+
+function initStoryOptions() {
+  Object.values(stories).forEach((story) => {
+    const option = document.createElement("option");
+    option.value = story.id;
+    option.textContent = story.title;
+    storySelect.appendChild(option);
   });
 }
-initStoryOptions();
 
-/* bindings */
-musicFooter && musicFooter.addEventListener('click', ()=>{
-  if (bgm.paused) { bgm.play().catch(()=>{}); musicFooter.textContent='🔊'; }
-  else { bgm.pause(); musicFooter.textContent='🎵'; }
-});
-homeBtn && (homeBtn.addEventListener('click', ()=> location.href = '../main menu.html'));
-homeFooter && (homeFooter.addEventListener('click', ()=> location.href = '../main menu.html'));
+function renderSlots(count) {
+  dropArea.innerHTML = "";
+  for (let i = 0; i < count; i += 1) {
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slot.dataset.index = String(i);
+    slot.addEventListener("dragover", (event) => event.preventDefault());
+    slot.addEventListener("drop", onDropToSlot);
+    dropArea.appendChild(slot);
+  }
+}
 
-startBtn.addEventListener('click', ()=> {
-  const id = storySelect.value || 'andi';
-  openStory(id);
-});
+function renderWordBank(words) {
+  wordBankEl.innerHTML = "";
+  words.forEach((word) => {
+    const el = document.createElement("div");
+    el.className = "word";
+    el.textContent = word;
+    el.draggable = true;
+    el.dataset.word = word;
+    el.addEventListener("dragstart", onDragStart);
+    el.addEventListener("dragend", onDragEnd);
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    wordBankEl.appendChild(el);
+  });
+}
 
-/* ---------- scene lifecycle ---------- */
-function openStory(id){
+function loadScene() {
+  const scene = currentStory.scenes[currentSceneIndex];
+  const words = getSceneWords();
+
+  sceneImg.src = scene.img;
+  sceneImg.alt = `Gambar ${currentSceneIndex + 1}`;
+  sceneImg.onerror = function onImageError() {
+    this.src = "";
+    feedback.textContent = "(Gambar tidak ditemukan)";
+  };
+
+  sceneIndexBadge.textContent = `${currentSceneIndex + 1}/${currentStory.scenes.length}`;
+  renderSlots(words.length);
+  renderWordBank(shuffleArray(words));
+  hintLevel = 0;
+  hintedSlots.clear();
+  sceneSolved = !!progress[sceneKey()];
+  nextBtn.classList.toggle("hidden", !sceneSolved);
+  feedback.textContent = sceneSolved
+    ? "Scene ini sudah selesai. Tekan Lanjut untuk melanjutkan cerita."
+    : "Susun kata dari gambar menjadi sebuah kalimat.";
+}
+
+function openStory(id) {
   currentStory = stories[id];
   currentSceneIndex = 0;
-  sceneArea.classList.remove('hidden');
-  feedback.textContent = '';
+  sceneArea.classList.remove("hidden");
   loadScene();
 }
 
-function loadScene(){
-  const scene = currentStory.scenes[currentSceneIndex];
-  sceneImg.src = scene.img;
-  sceneImg.onerror = function() { 
-    this.src = ''; 
-    feedback.textContent = '(Gambar tidak ditemukan)';
-  };
-  sceneImg.alt = `Gambar ${currentSceneIndex+1}`;
-  sceneIndexBadge.textContent = `${currentSceneIndex+1}/${currentStory.scenes.length}`;
-
-  const words = scene.sentence.split(/\s+/).filter(Boolean);
-  shuffledWords = shuffleArray(words);
-  renderSlots(words.length);
-  renderWordBank(shuffledWords);
-  nextBtn.classList.add('hidden');
-  hintLevel = 0;
-  hintedSlots.clear();
-  feedback.textContent = 'Susun kata dari gambar menjadi sebuah kalimat.';
-  // if completed earlier
-  const key = `${currentStory.id}_${currentSceneIndex}`;
-  if (progress[key]) {
-    feedback.textContent = 'Sudah terselesaikan. Tekan Lanjut.';
-    nextBtn.classList.remove('hidden');
-  }
-}
-
-/* ---------- rendering ---------- */
-function renderSlots(n) {
-  dropArea.innerHTML = '';
-  for (let i=0;i<n;i++){
-    const s = document.createElement('div');
-    s.className = 'slot';
-    s.dataset.index = i;
-    s.addEventListener('dragover', e=> e.preventDefault());
-    s.addEventListener('drop', onDropToSlot);
-    dropArea.appendChild(s);
-  }
-}
-function renderWordBank(words) {
-  wordBankEl.innerHTML = '';
-  words.forEach(w=>{
-    const el = document.createElement('div');
-    el.className = 'word';
-    el.textContent = w;
-    el.draggable = true;
-    el.dataset.word = w;
-    el.addEventListener('dragstart', onDragStart);
-    el.addEventListener('dragend', onDragEnd);
-    el.addEventListener('touchstart', onTouchStart, {passive: true});
-    el.addEventListener('touchmove', onTouchMove, {passive: false});
-    el.addEventListener('touchend', onTouchEnd, {passive: true});
-    wordBankEl.appendChild(el);
-  });
-}
-
-/* ---------- drag/drop & touch support ---------- */
-let draggedElement = null;
-let touchStartElement = null;
-
-function onDragStart(e){
-  draggedElement = e.target;
-  e.dataTransfer.setData('text/plain', e.target.dataset.word);
-  e.dataTransfer.effectAllowed = 'move';
-  e.target.classList.add('dragging');
-}
-function onDragEnd(e){
-  e.target.classList.remove('dragging');
-  draggedElement = null;
-}
-
-// Touch support for mobile
-function onTouchStart(e){
-  touchStartElement = e.target.closest('.word');
-  if (touchStartElement) {
-    touchStartElement.classList.add('dragging');
-  }
-}
-
-function onTouchMove(e){
-  if (!touchStartElement) return;
-  e.preventDefault();
-  const touch = e.touches[0];
-  const el = document.elementFromPoint(touch.clientX, touch.clientY);
-  
-  if (el && el.classList.contains('slot')) {
-    el.classList.add('drag-over');
-  }
-  
-  document.querySelectorAll('.slot.drag-over').forEach(s => {
-    if (s !== el) s.classList.remove('drag-over');
-  });
-}
-
-function onTouchEnd(e){
-  if (!touchStartElement) return;
-  
-  const touch = e.changedTouches[0];
-  const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
-  
-  if (targetEl && targetEl.classList.contains('slot')) {
-    const slot = targetEl;
-    if (slot.firstChild){
-      wordBankEl.appendChild(slot.firstChild);
-    }
-    slot.appendChild(touchStartElement);
-    slot.classList.add('filled');
-    checkAssembly();
-  } else if (targetEl && targetEl.closest('#wordBank')) {
-    if (touchStartElement.parentElement.classList.contains('slot')) {
-      touchStartElement.parentElement.classList.remove('filled');
-    }
-    wordBankEl.appendChild(touchStartElement);
-    checkAssembly();
-  }
-  
-  touchStartElement.classList.remove('dragging');
-  document.querySelectorAll('.slot.drag-over').forEach(s => s.classList.remove('drag-over'));
-  touchStartElement = null;
-}
-
-function onDropToSlot(e){
-  e.preventDefault();
-  const slot = e.currentTarget;
-  // if slot has child, return it to bank
-  if (slot.firstChild){
+function setSlotWord(slot, wordEl) {
+  if (slot.firstChild) {
     wordBankEl.appendChild(slot.firstChild);
   }
-  const wordText = e.dataTransfer.getData('text/plain');
-  const draggedEl = Array.from(document.querySelectorAll('.word')).find(x=>x.dataset.word===wordText);
+  slot.appendChild(wordEl);
+  slot.classList.add("filled");
+}
+
+function onDragStart(event) {
+  draggedWord = event.target;
+  event.dataTransfer.setData("text/plain", event.target.dataset.word);
+  event.target.classList.add("dragging");
+}
+
+function onDragEnd(event) {
+  event.target.classList.remove("dragging");
+  draggedWord = null;
+}
+
+function onDropToSlot(event) {
+  event.preventDefault();
+  const slot = event.currentTarget;
+  const word = event.dataTransfer.getData("text/plain");
+  const draggedEl =
+    draggedWord ||
+    Array.from(document.querySelectorAll(".word")).find((candidate) => candidate.dataset.word === word);
+
   if (!draggedEl) return;
-  slot.appendChild(draggedEl);
-  slot.classList.add('filled');
-  // when user moves a hinted slot's word away, keep noted (we will restore on hint press)
+
+  setSlotWord(slot, draggedEl);
   checkAssembly();
 }
-/* allow dropping back to bank */
-wordBankEl.addEventListener('dragover', e=> e.preventDefault());
-wordBankEl.addEventListener('drop', e=>{
-  e.preventDefault();
-  const word = e.dataTransfer.getData('text/plain');
-  const el = Array.from(document.querySelectorAll('.slot .word')).find(x=>x.dataset.word===word);
-  if (el) {
-    wordBankEl.appendChild(el);
-    el.parentElement.classList.remove('filled');
-  }
+
+wordBankEl.addEventListener("dragover", (event) => event.preventDefault());
+wordBankEl.addEventListener("drop", (event) => {
+  event.preventDefault();
+  const word = event.dataTransfer.getData("text/plain");
+  const slotWord = Array.from(document.querySelectorAll(".slot .word")).find((item) => item.dataset.word === word);
+  if (!slotWord) return;
+  const parentSlot = slotWord.parentElement;
+  wordBankEl.appendChild(slotWord);
+  parentSlot.classList.remove("filled");
   checkAssembly();
 });
 
-/* ---------- assembly check ---------- */
-function getSceneWords(){ return currentStory.scenes[currentSceneIndex].sentence.split(/\s+/).filter(Boolean); }
+function onTouchStart(event) {
+  touchStartElement = event.target.closest(".word");
+  if (touchStartElement) touchStartElement.classList.add("dragging");
+}
 
-function checkAssembly(){
-  const words = getSceneWords();
-  const slots = Array.from(dropArea.querySelectorAll('.slot'));
-  const assembled = slots.map(s => s.firstChild ? s.firstChild.dataset.word : null);
+function onTouchMove(event) {
+  if (!touchStartElement) return;
+  event.preventDefault();
+  const touch = event.touches[0];
+  const hovered = document.elementFromPoint(touch.clientX, touch.clientY);
 
-  slots.forEach(s=>{ if (s.firstChild) s.classList.add('filled'); else s.classList.remove('filled'); });
+  document.querySelectorAll(".slot.drag-over").forEach((slot) => slot.classList.remove("drag-over"));
+  if (hovered && hovered.classList.contains("slot")) {
+    hovered.classList.add("drag-over");
+  }
+}
 
-  if (assembled.some(x=>x===null)) return;
+function onTouchEnd(event) {
+  if (!touchStartElement) return;
 
-  const correct = assembled.join(' ') === words.join(' ');
+  const touch = event.changedTouches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+
+  if (target && target.classList.contains("slot")) {
+    setSlotWord(target, touchStartElement);
+  } else if (target && target.closest("#wordBank")) {
+    if (touchStartElement.parentElement.classList.contains("slot")) {
+      touchStartElement.parentElement.classList.remove("filled");
+    }
+    wordBankEl.appendChild(touchStartElement);
+  }
+
+  touchStartElement.classList.remove("dragging");
+  document.querySelectorAll(".slot.drag-over").forEach((slot) => slot.classList.remove("drag-over"));
+  touchStartElement = null;
+  checkAssembly();
+}
+
+function updateSlotClasses() {
+  dropArea.querySelectorAll(".slot").forEach((slot) => {
+    slot.classList.toggle("filled", !!slot.firstChild);
+  });
+}
+
+function onSceneCorrect() {
+  if (sceneSolved) return;
+
+  sceneSolved = true;
+  progress[sceneKey()] = true;
+  localStorage.setItem(progressKey, JSON.stringify(progress));
+
+  const rewardResult =
+    window.rewardSystem && typeof window.rewardSystem.grantStorySceneReward === "function"
+      ? window.rewardSystem.grantStorySceneReward(currentStory.id, currentSceneIndex, currentStory.scenes.length)
+      : null;
+
+  playYeayOnce(sceneKey());
+  spawnStars(10);
+  nextBtn.classList.remove("hidden");
+  feedback.textContent =
+    rewardResult && rewardResult.granted
+      ? "Benar! Kamu mendapat 2 bintang baru. Tekan Lanjut."
+      : "Benar! Cerita siap dilanjutkan. Tekan Lanjut.";
+}
+
+function checkAssembly() {
+  updateSlotClasses();
+
+  if (sceneSolved) return;
+
+  const slots = Array.from(dropArea.querySelectorAll(".slot"));
+  const assembled = slots.map((slot) => (slot.firstChild ? slot.firstChild.dataset.word : null));
+
+  if (assembled.some((word) => word === null)) return;
+
+  const correct = assembled.join(" ") === getSceneWords().join(" ");
   if (correct) {
     onSceneCorrect();
   } else {
-    // wrong: play aww reliably
     playWrong();
-    feedback.textContent = 'Urutan belum benar. Coba lagi.';
-    dropArea.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:300});
+    feedback.textContent = "Urutan belum benar. Coba lagi.";
+    dropArea.animate(
+      [
+        { transform: "translateX(0)" },
+        { transform: "translateX(-8px)" },
+        { transform: "translateX(8px)" },
+        { transform: "translateX(0)" },
+      ],
+      { duration: 300 }
+    );
   }
 }
 
-/* ---------- correct handling ---------- */
-function onSceneCorrect(){
-  const key = `${currentStory.id}_${currentSceneIndex}`;
-  feedback.textContent = 'Benar! Yeay 🎉';
-  playYeayOnce(key);
-  spawnStars(10);
-  progress[key] = true;
-  localStorage.setItem(progressKey, JSON.stringify(progress));
-  nextBtn.classList.remove('hidden');
-  setTimeout(()=> {
-    if (currentSceneIndex < currentStory.scenes.length - 1) {
-      currentSceneIndex++;
-      loadScene();
-    } else {
-      feedback.textContent = 'Selamat! Cerita selesai.';
-    }
-  }, 900);
-}
-
-/* ---------- next/clear ---------- */
-nextBtn.addEventListener('click', ()=> {
-  if (currentSceneIndex < currentStory.scenes.length - 1) {
-    currentSceneIndex++;
-    loadScene();
-  } else {
-    feedback.textContent = 'Ini sudah scene terakhir.';
-  }
-});
-clearBtn.addEventListener('click', ()=> {
-  const slots = Array.from(dropArea.querySelectorAll('.slot'));
-  slots.forEach(s=>{
-    if (s.firstChild) wordBankEl.appendChild(s.firstChild);
-    s.classList.remove('filled');
-  });
-  feedback.textContent = 'Susunan dikosongkan.';
-  hintLevel = 0;
-  hintedSlots.clear();
-});
-
-/* ---------- hint logic ---------- */
-function fillSlotWithWord(index, wordText){
+function fillSlotWithWord(index, wordText) {
   const slot = dropArea.querySelector(`.slot[data-index="${index}"]`);
   if (!slot) return false;
-  // if correct word already there, ok
+
   if (slot.firstChild && slot.firstChild.dataset.word === wordText) return true;
-  // remove word from wherever it is
-  const existingInSlot = Array.from(dropArea.querySelectorAll('.slot .word')).find(w => w.dataset.word === wordText);
-  if (existingInSlot) existingInSlot.parentElement.removeChild(existingInSlot);
-  // find word in bank
-  let bankEl = Array.from(document.querySelectorAll('.word')).find(x=>x.dataset.word===wordText);
-  if (!bankEl) {
-    // create fallback
-    bankEl = document.createElement('div');
-    bankEl.className = 'word';
-    bankEl.textContent = wordText;
-    bankEl.dataset.word = wordText;
-    bankEl.draggable = true;
-    bankEl.addEventListener('dragstart', onDragStart);
-    bankEl.addEventListener('dragend', onDragEnd);
-    wordBankEl.appendChild(bankEl);
-  }
-  slot.appendChild(bankEl);
-  slot.classList.add('filled');
+
+  const existing = Array.from(document.querySelectorAll(".word")).find((item) => item.dataset.word === wordText);
+  if (!existing) return false;
+
+  setSlotWord(slot, existing);
   return true;
 }
 
-function applyHintLevel(level){
+function applyHintLevel(level) {
   const words = getSceneWords();
-  if (level <= 0) return;
-  if (level === 1 || level === 2){
-    for (let i=0;i<level && i<words.length;i++){
-      const success = fillSlotWithWord(i, words[i]);
-      if (success) hintedSlots.add(i);
+  if (sceneSolved) {
+    feedback.textContent = "Scene ini sudah selesai. Tekan Lanjut untuk melanjutkan cerita.";
+    return;
+  }
+
+  if (level === 1 || level === 2) {
+    for (let i = 0; i < level && i < words.length; i += 1) {
+      if (fillSlotWithWord(i, words[i])) {
+        hintedSlots.add(i);
+      }
     }
     feedback.textContent = `Petunjuk level ${level}: ${Math.min(level, words.length)} kata terisi.`;
     checkAssembly();
     return;
   }
-  // level 3: do not insert new words — restore any hinted slots to correct words
-  hintedSlots.forEach(i=>{
-    const desired = words[i];
-    fillSlotWithWord(i, desired);
+
+  hintedSlots.forEach((index) => {
+    fillSlotWithWord(index, words[index]);
   });
-  feedback.textContent = 'Petunjuk level 3: dengarkan dubbing.';
-  const u = new SpeechSynthesisUtterance(words.join(' '));
-  u.lang = 'id-ID';
-  u.rate = 0.95;
+
+  feedback.textContent = "Petunjuk level 3: dengarkan kalimatnya.";
+  const utterance = new SpeechSynthesisUtterance(words.join(" "));
+  utterance.lang = "id-ID";
+  utterance.rate = 0.95;
   window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
+  window.speechSynthesis.speak(utterance);
 }
 
-/* hint button semantics: 1->2->3 (sticky at 3) */
-hintBtn.addEventListener('click', ()=> {
+function shuffleArray(values) {
+  return values.slice().sort(() => Math.random() - 0.5);
+}
+
+musicBtn && musicBtn.addEventListener("click", () => {
+  if (bgm.paused) {
+    bgm.play().catch(() => {});
+  } else {
+    bgm.pause();
+  }
+  syncMusicIcon();
+});
+
+homeBtn && homeBtn.addEventListener("click", () => {
+  location.href = "../main menu.html";
+});
+
+homeFooter && homeFooter.addEventListener("click", () => {
+  location.href = "../main menu.html";
+});
+
+startBtn.addEventListener("click", () => {
+  openStory(storySelect.value || "andi");
+});
+
+nextBtn.addEventListener("click", () => {
+  if (!sceneSolved) {
+    feedback.textContent = "Selesaikan scene ini dulu sebelum lanjut.";
+    return;
+  }
+
+  if (currentSceneIndex < currentStory.scenes.length - 1) {
+    currentSceneIndex += 1;
+    loadScene();
+  } else {
+    feedback.textContent = "Selamat! Ceritanya selesai.";
+    nextBtn.classList.add("hidden");
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  dropArea.querySelectorAll(".slot").forEach((slot) => {
+    if (slot.firstChild) wordBankEl.appendChild(slot.firstChild);
+    slot.classList.remove("filled");
+  });
+  hintLevel = 0;
+  hintedSlots.clear();
+  feedback.textContent = sceneSolved
+    ? "Scene ini sudah selesai. Tekan Lanjut untuk melanjutkan cerita."
+    : "Susunan dikosongkan.";
+});
+
+hintBtn.addEventListener("click", () => {
   if (!currentStory) return;
-  if (hintLevel < 3) hintLevel++;
-  // if already 3, keep 3; pressing will re-restore hinted slots
+  if (hintLevel < 3) hintLevel += 1;
   applyHintLevel(hintLevel);
 });
 
-/* star button */
-if (starBtn) starBtn.addEventListener('click', ()=> spawnStars(12));
-
-/* ---------- utils ---------- */
-function shuffleArray(arr){ return arr.slice().sort(()=>Math.random()-0.5); }
-function spawnStars(n=10){
-  for (let i=0;i<n;i++){
-    const el = document.createElement('div');
-    el.className = 'bintang';
-    el.textContent = '⭐';
-    el.style.left = (Math.random()*88 + 4) + 'vw';
-    el.style.fontSize = (16 + Math.random()*30) + 'px';
-    document.body.appendChild(el);
-    setTimeout(()=> el.remove(), 2600);
-  }
+if (starBtn) {
+  starBtn.addEventListener("click", () => spawnStars(12));
 }
 
-/* ---------- init default ---------- */
-(function init(){
-  storySelect.value = Object.keys(stories)[0];
-  Object.keys(stories).forEach(id=>{
-    // already populated in initStoryOptions, sync just in case
-  });
-  startBtn.click();
-})();
+initStoryOptions();
+storySelect.value = Object.keys(stories)[0];
+syncMusicIcon();
+startBtn.click();

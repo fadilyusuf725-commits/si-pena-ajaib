@@ -1,56 +1,104 @@
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Si Pena Ajaib</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="main menu.css">
 </head>
 <body>
-
   <header>
     <h1 class="judul">Si Pena Ajaib</h1>
-    <button class="btn-start">Mulai Belajar</button>
+    <a class="btn-start" id="resumeBtn" href="menu hurufku/a/a.html">Mulai Belajar</a>
   </header>
 
- <main class="container">
-
-    <!-- Karakter Pena -->
-  <!-- Karakter Pena -->
+  <main class="container">
     <img src="pena.png" class="pena" alt="Karakter Pena">
-   
-    <!-- Balon Dialog -->
+
     <div class="speech">
       Hi! <br>
       Ayo belajar menulis!
     </div>
 
-    <!-- Menu Pilihan -->
-    <div class="menu-wrapper">
-      <div class="menu-item" onclick="bukaMenu('huruf')">
-        <div class="icon">A</div>
-        <p>Hurufku</p>
-      </div>
+    <nav class="menu-wrapper" aria-label="Menu belajar">
+      <a class="menu-item" href="menu hurufku/a/a.html" data-menu-target="menu hurufku/a/a.html">
+        <span class="icon" aria-hidden="true">A</span>
+        <span class="menu-label">Hurufku</span>
+      </a>
 
-      <div class="menu-item" onclick="bukaMenu('kata')">
-        <div class="icon">🍎</div>
-        <p>Kataku</p>
-      </div>
+      <a class="menu-item" href="menu kataku/kataku.html" data-menu-target="menu kataku/kataku.html">
+        <span class="icon" aria-hidden="true">&#127822;</span>
+        <span class="menu-label">Kataku</span>
+      </a>
 
-      <div class="menu-item" onclick="bukaMenu('cerita')">
-        <div class="icon">📖</div>
-        <p>Ceritaku</p>
-      </div>
+      <a class="menu-item" href="menu ceritaku/menu ceritaku.html" data-menu-target="menu ceritaku/menu ceritaku.html">
+        <span class="icon" aria-hidden="true">&#128214;</span>
+        <span class="menu-label">Ceritaku</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer>
+    <button class="footer-icon footer-button" type="button" onclick="jatuhkanBintang()" aria-label="Tampilkan bintang">
+      &#11088;
+    </button>
+    <button id="musicBtn" class="footer-icon footer-button" type="button" onclick="toggleAudio()" aria-label="Atur musik">
+      &#127925;
+    </button>
+    <button id="kurikulumBtn" class="footer-link" type="button">CP/TP/ATP</button>
+  </footer>
+
+  <div id="kurikulumModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="kurikulumTitle">
+    <div class="modal-backdrop" data-close-modal="true"></div>
+    <div class="modal-card">
+      <button id="closeKurikulumBtn" class="modal-close" type="button" aria-label="Tutup panel kurikulum">&times;</button>
+      <h2 id="kurikulumTitle">CP, TP, ATP Bahasa Indonesia Kelas 1</h2>
+      <p class="modal-note">
+        Acuan utamanya adalah Capaian Pembelajaran Bahasa Indonesia Fase A Kurikulum Merdeka. Ringkasan TP dan ATP di bawah ini disederhanakan agar selaras dengan aktivitas menulis awal di Si Pena Ajaib.
+      </p>
+
+      <section class="modal-section">
+        <h3>CP</h3>
+        <ul>
+          <li>Menyimak dengan penuh perhatian dan memahami pesan lisan, instruksi, serta percakapan sederhana.</li>
+          <li>Membaca kata-kata yang dekat dengan keseharian dan memahami informasi sederhana dari bacaan atau tayangan.</li>
+          <li>Berbicara dengan santun, bertanya, menjawab, dan menceritakan kembali informasi yang didengar atau dibaca.</li>
+          <li>Menulis permulaan dengan benar, menebalkan huruf, memperbaiki tulisan tangan, dan menulis kalimat sederhana.</li>
+        </ul>
+      </section>
+
+      <section class="modal-section">
+        <h3>TP</h3>
+        <ul>
+          <li>Siswa mengenali bentuk huruf besar dan kecil lalu menebalkannya dengan arah goresan yang benar.</li>
+          <li>Siswa membaca dan menulis kata sederhana yang berkaitan dengan diri sendiri, keluarga, dan benda sekitar.</li>
+          <li>Siswa menyusun kata menjadi kalimat sederhana berdasarkan gambar atau contoh yang dibacakan.</li>
+          <li>Siswa menceritakan kembali isi gambar atau cerita singkat dengan kalimat lisan yang runtut.</li>
+        </ul>
+      </section>
+
+      <section class="modal-section">
+        <h3>ATP</h3>
+        <ol>
+          <li>Latihan pramenulis: posisi duduk, cara memegang alat tulis, dan menebalkan garis dasar.</li>
+          <li>Pengenalan huruf dan bunyi: menelusuri huruf, menyebutkan bunyi awal, lalu mencocokkan huruf dengan gambar.</li>
+          <li>Penguatan kata sederhana: membaca, menulis, dan melengkapi kata yang dekat dengan pengalaman harian anak.</li>
+          <li>Pengembangan makna: menyusun kalimat dan menceritakan kembali isi gambar atau cerita sederhana.</li>
+        </ol>
+      </section>
+
+      <section class="modal-section">
+        <h3>Rujukan Resmi</h3>
+        <a class="reference-link" href="https://guru.kemendikdasmen.go.id/kurikulum/referensi-penerapan/capaian-pembelajaran/sd-sma/bahasa-indonesia/fase-a/" target="_blank" rel="noopener noreferrer">
+          Portal Guru Kemendikdasmen: CP &amp; ATP Bahasa Indonesia Fase A
+        </a>
+      </section>
     </div>
+  </div>
 
-</main>
-
-<footer>
-    <div class="footer-icon" onclick="jatuhkanBintang()">⭐</div>
-  <div id="musicBtn" class="footer-icon" onclick="toggleAudio()">🎵</div>
-</footer>
-
-<script src="menu hurufku/guides.js"></script>
-<script src="main menu.js"></script>
+  <script src="menu hurufku/guides.js"></script>
+  <script src="rewards.js"></script>
+  <script src="main menu.js"></script>
 </body>
 </html>
-
