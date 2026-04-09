@@ -17,6 +17,8 @@
 body {
   margin: 0;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family: 'Nunito', sans-serif;
   background: var(--bg);
   overflow-x: hidden;
@@ -32,13 +34,21 @@ header {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 25px 40px;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 25px 0 12px;
 }
 
 .judul {
   margin: 0;
   font-size: 36px;
   font-weight: 800;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
 .btn-start {
@@ -62,22 +72,55 @@ header {
   transform: translateY(-2px);
 }
 
+.header-link {
+  border: 3px solid var(--primary);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--primary);
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.header-link:hover,
+.header-link:focus-visible {
+  background: #eefcff;
+  transform: translateY(-1px);
+}
+
 .container {
-  position: relative;
-  min-height: 620px;
-  padding: 0 40px 120px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px 120px;
+}
+
+.hero-layout {
+  width: min(1080px, 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+}
+
+.menu-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
 }
 
 .pena {
-  width: 235px;
-  margin-top: 20px;
+  width: min(260px, 28vw);
+  min-width: 180px;
 }
 
 .speech {
-  position: absolute;
-  top: 180px;
-  left: 330px;
-  width: 300px;
+  position: relative;
+  width: min(360px, 100%);
   background: var(--surface);
   padding: 34px 36px;
   border: 4px solid var(--primary);
@@ -113,18 +156,18 @@ header {
 }
 
 .menu-wrapper {
-  display: flex;
-  gap: 35px;
-  position: absolute;
-  top: 380px;
-  left: 330px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 24px;
+  width: 100%;
 }
 
 .menu-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 160px;
+  justify-content: center;
+  width: 100%;
   min-height: 160px;
   background: var(--surface);
   border: 4px solid var(--primary);
@@ -171,7 +214,6 @@ footer {
 }
 
 .footer-button,
-.footer-link,
 .modal-close {
   font: inherit;
 }
@@ -186,24 +228,6 @@ footer {
 
 .footer-icon {
   font-size: 30px;
-}
-
-.footer-link {
-  border: 3px solid var(--primary);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--primary);
-  padding: 8px 18px;
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.footer-link:hover,
-.footer-link:focus-visible {
-  background: #eefcff;
-  transform: translateY(-1px);
 }
 
 .bintang {
@@ -292,7 +316,8 @@ footer {
 
 @media (max-width: 1024px) and (min-width: 769px) {
   header {
-    padding: 20px 30px;
+    width: min(980px, calc(100% - 32px));
+    padding: 20px 0 10px;
   }
 
   .judul {
@@ -300,31 +325,25 @@ footer {
   }
 
   .container {
-    min-height: 580px;
-    padding: 0 24px 110px;
+    padding: 8px 24px 110px;
   }
 
-  .pena {
-    width: 180px;
-    margin-left: 20px;
+  .hero-layout {
+    gap: 32px;
   }
 
   .speech {
-    top: 160px;
-    left: 250px;
     width: 280px;
     padding: 28px 30px;
     font-size: 22px;
   }
 
   .menu-wrapper {
-    top: 360px;
-    left: 250px;
-    gap: 25px;
+    grid-template-columns: repeat(3, minmax(130px, 1fr));
+    gap: 18px;
   }
 
   .menu-item {
-    width: 150px;
     min-height: 150px;
     font-size: 20px;
   }
@@ -337,7 +356,8 @@ footer {
 @media (max-width: 768px) {
   header {
     flex-direction: column;
-    padding: 15px 20px;
+    width: min(560px, calc(100% - 32px));
+    padding: 15px 0 10px;
     gap: 15px;
   }
 
@@ -346,29 +366,41 @@ footer {
     text-align: center;
   }
 
+  .header-actions {
+    width: min(100%, 360px);
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .header-link,
   .btn-start {
-    width: 100%;
+    width: auto;
     padding: 8px 20px;
     font-size: 14px;
   }
 
+  .header-link {
+    flex: 0 0 auto;
+  }
+
+  .btn-start {
+    flex: 1 1 auto;
+    max-width: 220px;
+  }
+
   .container {
-    min-height: auto;
-    padding: 0 20px 110px;
+    padding: 8px 20px 110px;
+  }
+
+  .hero-layout {
+    flex-direction: column;
+    gap: 20px;
     text-align: center;
   }
 
-  .pena {
-    width: 150px;
-    margin: 10px auto 0;
-  }
-
   .speech {
-    position: relative;
-    top: auto;
-    left: auto;
     width: min(280px, 100%);
-    margin: 20px auto;
     padding: 20px 24px;
     font-size: 18px;
     text-align: left;
@@ -387,13 +419,9 @@ footer {
   }
 
   .menu-wrapper {
-    position: relative;
-    top: auto;
-    left: auto;
     flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 15px;
-    align-items: center;
-    margin: 20px auto 0;
   }
 
   .menu-item {
@@ -419,11 +447,6 @@ footer {
     font-size: 24px;
   }
 
-  .footer-link {
-    font-size: 14px;
-    padding: 7px 16px;
-  }
-
   .modal-card {
     margin: 18px auto;
     max-height: calc(100vh - 36px);
@@ -433,13 +456,15 @@ footer {
 
 @media (max-width: 480px) {
   header {
-    padding: 12px 15px;
+    width: min(420px, calc(100% - 24px));
+    padding: 12px 0 10px;
   }
 
   .judul {
     font-size: 20px;
   }
 
+  .header-link,
   .btn-start {
     font-size: 12px;
     padding: 6px 16px;
@@ -447,11 +472,11 @@ footer {
 
   .pena {
     width: 120px;
+    min-width: 120px;
   }
 
   .speech {
     width: min(260px, 100%);
-    margin: 15px auto;
     padding: 16px 20px;
     font-size: 14px;
   }

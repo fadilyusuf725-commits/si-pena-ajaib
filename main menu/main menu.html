@@ -10,33 +10,40 @@
 <body>
   <header>
     <h1 class="judul">Si Pena Ajaib</h1>
-    <a class="btn-start" id="resumeBtn" href="menu hurufku/a/a.html">Mulai Belajar</a>
+    <div class="header-actions">
+      <button id="kurikulumBtn" class="header-link" type="button">CP/TP/ATP</button>
+      <a class="btn-start" id="resumeBtn" href="menu hurufku/a/a.html">Mulai Belajar</a>
+    </div>
   </header>
 
   <main class="container">
-    <img src="pena.png" class="pena" alt="Karakter Pena">
+    <section class="hero-layout">
+      <img src="pena.png" class="pena" alt="Karakter Pena">
 
-    <div class="speech">
-      Hi! <br>
-      Ayo belajar menulis!
-    </div>
+      <div class="menu-panel">
+        <div class="speech">
+          Hi! <br>
+          Ayo belajar menulis!
+        </div>
 
-    <nav class="menu-wrapper" aria-label="Menu belajar">
-      <a class="menu-item" href="menu hurufku/a/a.html" data-menu-target="menu hurufku/a/a.html">
-        <span class="icon" aria-hidden="true">A</span>
-        <span class="menu-label">Hurufku</span>
-      </a>
+        <nav class="menu-wrapper" aria-label="Menu belajar">
+          <a class="menu-item" href="menu hurufku/a/a.html" data-menu-target="menu hurufku/a/a.html">
+            <span class="icon" aria-hidden="true">A</span>
+            <span class="menu-label">Hurufku</span>
+          </a>
 
-      <a class="menu-item" href="menu kataku/kataku.html" data-menu-target="menu kataku/kataku.html">
-        <span class="icon" aria-hidden="true">&#127822;</span>
-        <span class="menu-label">Kataku</span>
-      </a>
+          <a class="menu-item" href="menu kataku/kataku.html" data-menu-target="menu kataku/kataku.html">
+            <span class="icon" aria-hidden="true">&#127822;</span>
+            <span class="menu-label">Kataku</span>
+          </a>
 
-      <a class="menu-item" href="menu ceritaku/menu ceritaku.html" data-menu-target="menu ceritaku/menu ceritaku.html">
-        <span class="icon" aria-hidden="true">&#128214;</span>
-        <span class="menu-label">Ceritaku</span>
-      </a>
-    </nav>
+          <a class="menu-item" href="menu ceritaku/menu ceritaku.html" data-menu-target="menu ceritaku/menu ceritaku.html">
+            <span class="icon" aria-hidden="true">&#128214;</span>
+            <span class="menu-label">Ceritaku</span>
+          </a>
+        </nav>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -46,7 +53,6 @@
     <button id="musicBtn" class="footer-icon footer-button" type="button" onclick="toggleAudio()" aria-label="Atur musik">
       &#127925;
     </button>
-    <button id="kurikulumBtn" class="footer-link" type="button">CP/TP/ATP</button>
   </footer>
 
   <div id="kurikulumModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="kurikulumTitle">
