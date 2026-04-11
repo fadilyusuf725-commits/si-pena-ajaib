@@ -126,6 +126,35 @@ select {
   border-radius: 12px;
   font-weight: 800;
 }
+
+.usage-guide {
+  margin: 4px 0 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f5fcff, #e3f5ff);
+  border: 3px solid #b9e2ff;
+}
+
+.usage-guide-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.usage-guide-steps {
+  display: grid;
+  gap: 6px;
+}
+
+.usage-guide-steps p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #24557a;
+}
+
 .drop-area {
   min-height: 70px;
   border: 3px dashed #dbeefc;
@@ -420,6 +449,19 @@ footer {
     font-size: 12px;
   }
 
+  .usage-guide {
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+
+  .usage-guide-title {
+    font-size: 15px;
+  }
+
+  .usage-guide-steps p {
+    font-size: 13px;
+  }
+
   .drop-area {
     min-height: 60px;
     border-radius: 10px;
@@ -526,6 +568,25 @@ footer {
   .badge {
     padding: 4px 6px;
     font-size: 11px;
+  }
+
+  .usage-guide {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+  }
+
+  .usage-guide-title {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .usage-guide-steps {
+    gap: 5px;
+  }
+
+  .usage-guide-steps p {
+    font-size: 12px;
   }
 
   .drop-area {
